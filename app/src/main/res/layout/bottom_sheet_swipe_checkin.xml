@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/bottom_sheet_swipe_checkin.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:cardCornerRadius="20dp"
+    android:padding="12dp">
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        app:cardCornerRadius="20dp"
+        app:cardBackgroundColor="@android:color/white">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSwipe"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                app:cardCornerRadius="36dp"
+                app:cardElevation="2dp"
+                app:cardBackgroundColor="@color/green_acept">
+
+                <FrameLayout
+                    android:id="@+id/swipeContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp">
+
+                    <!-- Círculo blanco (elemento separado) -->
+                    <View
+                        android:id="@+id/whiteCircle"
+                        android:layout_width="45dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="start|center_vertical"
+                        android:background="@drawable/bg_white_circle"
+                        android:elevation="6dp" />
+
+                    <!-- Texto centrado -->
+                    <TextView
+                        android:id="@+id/tvInstruction"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:paddingStart="55dp"
+                        android:text="@string/desliza_derecha_ingreso"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold" />
+
+                    <!-- Slider invisible (solo captura el movimiento) -->
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/sliderConfirm"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:valueFrom="0"
+                        android:valueTo="100"
+                        android:stepSize="0"
+                        android:value="0"
+                        android:alpha="0" /> <!-- invisible pero funcional -->
+
+                    <!-- Ícono dentro del círculo -->
+                    <TextView
+                        android:id="@+id/tvChevrons"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="start|center_vertical"
+                        android:paddingStart="8dp"
+                        android:text="»»"
+                        android:textColor="@color/green_acept"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        android:elevation="6dp"/>
+                </FrameLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</LinearLayout>

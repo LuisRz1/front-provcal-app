@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/attendanceButton"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!-- Plato exterior (con sombra real) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/outerPlate"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:cardCornerRadius="130dp"
+        app:cardUseCompatPadding="true"
+        app:cardBackgroundColor="@android:color/transparent"
+        android:elevation="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/attendance_outer_plate"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Aro intermedio -->
+    <FrameLayout
+        android:id="@+id/middleRing"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
+        android:background="@drawable/attendance_middle_ring"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Botón interior clickeable -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/innerButton"
+        android:layout_width="170dp"
+        android:layout_height="170dp"
+        app:cardCornerRadius="85dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="@drawable/attendance_inner_ripple"
+        android:elevation="6dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/attendance_inner_button"
+            android:padding="8dp"> <!-- opcional: aire para el relief -->
+
+            <!-- Círculo de relieve -->
+            <FrameLayout
+                android:id="@+id/innerRelief"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:background="@drawable/attendance_inner_relief" />
+
+            <!-- Contenido -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/icTouch"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_touch"
+                    app:tint="#18A558"
+                    android:contentDescription="@string/desc_marcar_asistencia" />
+
+                <TextView
+                    android:id="@+id/labelAttendance"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="INGRESO"
+                    android:textStyle="bold"
+                    android:textColor="#2A3642"
+                    android:layout_marginTop="10dp" />
+            </LinearLayout>
+        </FrameLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

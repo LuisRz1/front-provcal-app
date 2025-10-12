@@ -3,4 +3,13 @@
     <string name="title_home">INICIO</string>
     <string name="title_dashboard">MENU</string>
     <string name="title_notifications">HORARIO</string>
+    <string name="desc_marcar_asistencia">INGRESO</string>
+    <string name="ingreso">INGRESO</string>
+    <string name="salida">SALIDA</string>
+    <string name="horas_totales">Horas Totales</string>
+    <string name="confirmar_asistencia">Confirmar asistencia</string>
+    <string name="confirmar_salida">Confirmar salida</string>
+    <string name="desliza_derecha_ingreso">Desliza a la derecha para marcar ingreso →</string>
+    <string name="desliza_derecha_salida">Desliza a la derecha para marcar salida →</string>
+    <string name="podras_cancelar_antes">Puedes soltar antes del final para cancelar.</string>
 </resources>
