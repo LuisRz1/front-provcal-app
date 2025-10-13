@@ -1,80 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/headerCard"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="16dp"
+    android:layout_height="72dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
     app:cardCornerRadius="16dp"
     app:cardUseCompatPadding="true"
-    android:elevation="0dp"
-    app:strokeWidth="0dp"
-    app:strokeColor="@android:color/transparent"
-    app:cardBackgroundColor="@android:color/transparent"
-    android:background="@android:color/transparent">
+    app:strokeWidth="0dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="96dp"
-        android:background="@android:color/transparent"
-        android:padding="16dp"> <!-- opcional -->
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:padding="12dp"
+        android:orientation="horizontal">
 
-        <!-- Avatar circular -->
-        <com.google.android.material.imageview.ShapeableImageView
-            android:id="@+id/imgAvatar"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <!-- Avatar -->
+        <ImageView
+            android:id="@+id/ivAvatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/ic_person_placeholder"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
+            android:contentDescription="@string/app_name" />
 
-        <!-- Ícono derecha (modo) -->
+        <!-- Nombre + “código” (usaremos email como placeholder) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvUserName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textStyle="bold"
+                android:textColor="#2A3642"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvUserCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="#7A8A99"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Botoncito de acciones (decorativo) -->
         <ImageView
-            android:id="@+id/imgModo"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:id="@+id/ivQuickAction"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
             android:src="@drawable/ic_sun"
-            android:contentDescription="@string/desc_modo"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/imgAvatar"
-            app:layout_constraintBottom_toBottomOf="@id/imgAvatar" />
-
-        <!-- Título -->
-        <TextView
-            android:id="@+id/txtGreeting"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:text="¡HOLA! LUIS ANGULO"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginStart="15dp"
-            android:textColor="@color/black"
-            app:layout_constraintEnd_toStartOf="@id/btnMode"
-            app:layout_constraintStart_toEndOf="@id/imgAvatar"
-            app:layout_constraintTop_toTopOf="@id/imgAvatar"/>
-
-        <!-- Subtítulo -->
-        <TextView
-            android:id="@+id/txtUserCode"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="MZ001234"
-            android:textColor="#7297B3"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@id/txtGreeting"
-            app:layout_constraintTop_toBottomOf="@id/txtGreeting" />
-
-        <!-- Ícono derecha -->
-        <ImageView
-            android:id="@+id/btnMode"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:tint="#2A3642"
+            android:contentDescription="@string/app_name" />
+    </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
