@@ -3,4 +3,32 @@
     <string name="title_home">INICIO</string>
     <string name="title_dashboard">MENU</string>
     <string name="title_notifications">HORARIO</string>
+    <string name="empleado">EMPLEADO</string>
+    <string name="cerrar_sesion">Cerrar Sesión</string>
+
+    <string name="pantalla_en_construccion">Pantalla en construcción…</string>
+    <string name="turnos_realizados">Turnos Realizados</string>
+    <string name="solicitud_cambio_turno">Solicitud para cambio de turno</string>
+    <string name="solicitar_vacaciones">Solicitar Vacaciones/Días Libres</string>
+
+    <string name="breadcrumb_vacaciones">Menú &gt; Solicitar Vacaciones/Días Libre</string>
+    <string name="tipo_solicitud">Tipo de solicitud</string>
+    <string name="dias">Días</string>
+    <string name="inicio">Inicio</string>
+    <string name="fin">Fin</string>
+    <string name="motivo_solicitud">Motivo de solicitud ...</string>
+    <string name="solicitar">Solicitar</string>
+
+    <string name="selecciona_rango">Selecciona el rango</string>
+    <string name="requerido">Requerido</string>
+    <string name="minimo_5">Mínimo 5 caracteres</string>
+    <string name="solicitud_enviada">Solicitud enviada</string>
+
+    <!-- valores de dropdown -->
+    <string name="tipo_vacaciones">Vacaciones</string>
+    <string name="tipo_dia_libre">Día libre</string>
+    <string name="dia_completo">Día completo</string>
+    <string name="medio_dia">Medio día</string>
+    <string name="max_7_dias">El rango no puede superar 7 días.</string>
+    <string name="rango_supera_dias">El rango excede los %1$d día(s) seleccionados.</string>
 </resources>

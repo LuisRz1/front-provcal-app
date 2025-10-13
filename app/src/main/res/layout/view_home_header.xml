@@ -56,7 +56,6 @@
             android:id="@+id/btnMode"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:contentDescription="@string/desc_modo"
             android:src="@drawable/ic_sun"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

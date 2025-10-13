@@ -5,21 +5,55 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_home">
 
+    <!-- HOME -->
     <fragment
         android:id="@+id/navigation_home"
         android:name="com.sanna.provcalapp.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
+    <!-- DASHBOARD -->
     <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.sanna.provcalapp.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard">
 
+        <!-- Acciones de navegación -->
+        <action
+            android:id="@+id/action_navigation_dashboard_to_shiftsFragment"
+            app:destination="@id/shiftsFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_shiftChangeFragment"
+            app:destination="@id/shiftChangeFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_vacationsFragment"
+            app:destination="@id/vacationsFragment" />
+    </fragment>
+
+    <!-- NOTIFICATIONS -->
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.sanna.provcalapp.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"
         tools:layout="@layout/fragment_notifications" />
+
+    <!-- DESTINOS DEL DASHBOARD -->
+    <fragment
+        android:id="@+id/shiftsFragment"
+        android:name="com.sanna.provcalapp.ui.menu.ShiftsFragment"
+        android:label="Turnos Realizados"
+        tools:layout="@layout/fragment_shifts" />
+
+    <fragment
+        android:id="@+id/shiftChangeFragment"
+        android:name="com.sanna.provcalapp.ui.menu.ShiftChangeFragment"
+        android:label="Cambio de Turno"
+        tools:layout="@layout/fragment_shift_change" />
+
+    <fragment
+        android:id="@+id/vacationsFragment"
+        android:name="com.sanna.provcalapp.ui.menu.VacationsFragment"
+        android:label="Vacaciones"
+        tools:layout="@layout/fragment_vacations" />
 </navigation>
