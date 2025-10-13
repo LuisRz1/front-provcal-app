@@ -3,4 +3,5 @@
     <string name="title_home">INICIO</string>
     <string name="title_dashboard">MENU</string>
     <string name="title_notifications">HORARIO</string>
+    <string name="desc_modo">Cambiar modo</string>
 </resources>

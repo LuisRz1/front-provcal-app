@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="96dp"
-        android:padding="16dp"> <!-- opcional -->
+        android:padding="16dp">
 
         <!-- Avatar circular -->
         <com.google.android.material.imageview.ShapeableImageView
@@ -25,6 +25,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent" />
 
+        <!-- Ícono derecha (modo) -->
+        <ImageView
+            android:id="@+id/imgModo"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_sun"
+            android:contentDescription="@string/desc_modo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/imgAvatar"
+            app:layout_constraintBottom_toBottomOf="@id/imgAvatar" />
+
         <!-- Título -->
         <TextView
             android:id="@+id/txtGreeting"
@@ -33,11 +44,11 @@
             android:text="¡HOLA! LUIS ANGULO"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:layout_marginLeft="15dp"
+            android:layout_marginStart="15dp"
             android:textColor="@color/black"
             app:layout_constraintStart_toEndOf="@id/imgAvatar"
             app:layout_constraintTop_toTopOf="@id/imgAvatar"
-            app:layout_constraintEnd_toStartOf="@id/btnMode" />
+            app:layout_constraintEnd_toStartOf="@id/imgModo" />
 
         <!-- Subtítulo -->
         <TextView
@@ -49,18 +60,7 @@
             android:textColor="#7297B3"
             app:layout_constraintStart_toStartOf="@id/txtGreeting"
             app:layout_constraintTop_toBottomOf="@id/txtGreeting"
-            app:layout_constraintEnd_toStartOf="@id/btnMode" />
-
-        <!-- Ícono derecha -->
-        <ImageView
-            android:id="@+id/btnMode"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="@string/desc_modo"
-            android:src="@drawable/ic_sun"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/imgModo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

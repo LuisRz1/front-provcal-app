@@ -3,27 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
+    android:layout_marginBottom="12dp"
     app:cardCornerRadius="12dp"
+    app:cardUseCompatPadding="true"
     app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="12dp">
+        android:padding="12dp"
+        android:gravity="center_vertical">
 
-        <!-- Pastilla fecha (verde) -->
+        <!-- Pastilla verde del día -->
         <LinearLayout
             android:layout_width="56dp"
-            android:layout_height="48dp"
+            android:layout_height="56dp"
             android:background="@drawable/bg_date_pill_green"
             android:gravity="center"
             android:orientation="vertical"
-            android:padding="4dp">
+            android:padding="6dp">
 
             <TextView
+                android:id="@+id/tvDateNum"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="08"
@@ -32,25 +34,25 @@
                 android:textColor="@android:color/white" />
 
             <TextView
+                android:id="@+id/tvDayName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="LUN"
                 android:textAllCaps="true"
-                android:textSize="11sp"
+                android:textSize="12sp"
                 android:textColor="@android:color/white" />
         </LinearLayout>
 
-        <!-- Columnas -->
+        <!-- 3 columnas -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="16dp"
             android:weightSum="3">
 
-            <!-- Col 1 -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -58,6 +60,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvStart"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="09:08 AM"
@@ -73,7 +76,6 @@
                     android:textColor="#7297B3" />
             </LinearLayout>
 
-            <!-- Col 2 -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -81,6 +83,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvEnd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="06:05 PM"
@@ -96,7 +99,6 @@
                     android:textColor="#7297B3" />
             </LinearLayout>
 
-            <!-- Col 3 -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -104,6 +106,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="08:13"
@@ -119,6 +122,5 @@
                     android:textColor="#7297B3" />
             </LinearLayout>
         </LinearLayout>
-
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
