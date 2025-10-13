@@ -7,12 +7,17 @@
     android:layout_margin="16dp"
     app:cardCornerRadius="16dp"
     app:cardUseCompatPadding="true"
-    android:elevation="6dp">
+    android:elevation="0dp"
+    app:strokeWidth="0dp"
+    app:strokeColor="@android:color/transparent"
+    app:cardBackgroundColor="@android:color/transparent"
+    android:background="@android:color/transparent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="96dp"
-        android:padding="16dp">
+        android:background="@android:color/transparent"
+        android:padding="16dp"> <!-- opcional -->
 
         <!-- Avatar circular -->
         <com.google.android.material.imageview.ShapeableImageView
@@ -20,10 +25,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_person_placeholder"
-            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full" />
 
         <!-- Ícono derecha (modo) -->
         <ImageView
@@ -41,14 +46,15 @@
             android:id="@+id/txtGreeting"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
             android:text="¡HOLA! LUIS ANGULO"
-            android:textStyle="bold"
             android:textSize="18sp"
+            android:textStyle="bold"
             android:layout_marginStart="15dp"
             android:textColor="@color/black"
+            app:layout_constraintEnd_toStartOf="@id/btnMode"
             app:layout_constraintStart_toEndOf="@id/imgAvatar"
-            app:layout_constraintTop_toTopOf="@id/imgAvatar"
-            app:layout_constraintEnd_toStartOf="@id/imgModo" />
+            app:layout_constraintTop_toTopOf="@id/imgAvatar"/>
 
         <!-- Subtítulo -->
         <TextView
@@ -56,11 +62,19 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="MZ001234"
-            android:textSize="14sp"
             android:textColor="#7297B3"
+            android:textSize="14sp"
             app:layout_constraintStart_toStartOf="@id/txtGreeting"
-            app:layout_constraintTop_toBottomOf="@id/txtGreeting"
-            app:layout_constraintEnd_toStartOf="@id/imgModo" />
+            app:layout_constraintTop_toBottomOf="@id/txtGreeting" />
+
+        <!-- Ícono derecha -->
+        <ImageView
+            android:id="@+id/btnMode"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

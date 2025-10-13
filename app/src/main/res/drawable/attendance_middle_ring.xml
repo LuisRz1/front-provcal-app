@@ -1,0 +1,22 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Fondo base -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#E2E6EA" />
+            <stroke android:width="2dp" android:color="#FFFFFF" />
+        </shape>
+    </item>
+
+    <!-- Sombra interior simulada -->
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="110dp"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#1A000000" /> <!-- sombra interna suave -->
+        </shape>
+    </item>
+
+</layer-list>
