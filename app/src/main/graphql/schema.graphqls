@@ -1,0 +1,126 @@
+# app/src/main/graphql/schema.graphqls
+
+type Query {
+    me: CurrentUserResponse!
+    mySchedule: WorkScheduleInfo!
+}
+
+type Mutation {
+    login(input: LoginInput!): LoginResponse!
+    checkIn(input: CheckInInput!): CheckInResponse!
+    checkOut(input: CheckOutInput!): CheckOutResponse!
+    startBreak(input: StartBreakInput!): StartBreakResponse!
+    endBreak(input: EndBreakInput!): EndBreakResponse!
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+input CheckInInput {
+    latitude: Float!
+    longitude: Float!
+    accuracy: Float!
+    workplaceLatitude: Float!
+    workplaceLongitude: Float!
+    workplaceRadiusMeters: Float!
+}
+
+input CheckOutInput {
+    latitude: Float!
+    longitude: Float!
+    accuracy: Float!
+}
+
+input StartBreakInput {
+    latitude: Float!
+    longitude: Float!
+    accuracy: Float!
+}
+
+input EndBreakInput {
+    latitude: Float!
+    longitude: Float!
+    accuracy: Float!
+}
+
+type LoginResponse {
+    accessToken: String!
+    refreshToken: String!
+    tokenType: String!
+    expiresIn: Int!
+    user: UserInfo!
+}
+
+type UserInfo {
+    id: String!
+    email: String!
+    fullName: String!
+    role: String!
+    employeeId: String!
+}
+
+type CurrentUserResponse {
+    id: String!
+    employeeId: String!
+    email: String!
+    personalEmail: String
+    fullName: String!
+    dni: String!
+    role: String!
+    status: String!
+    phone: String
+    address: String
+}
+
+type WorkScheduleInfo {
+    id: String!
+    userId: String!
+    shiftType: String!
+    startTime: String!
+    endTime: String!
+    workingDaysNames: [String!]!
+    lateToleranceMinutes: Int!
+    breakDurationMinutes: Int!
+    totalHoursPerDay: Float!
+    isActive: Boolean!
+    effectiveFrom: String!
+    effectiveUntil: String
+    notes: String
+}
+
+type CheckInResponse {
+    success: Boolean!
+    message: String
+    attendanceId: String
+    checkInTime: String
+    isLate: Boolean!
+    lateMinutes: Int!
+    isHoliday: Boolean!
+}
+
+type CheckOutResponse {
+    success: Boolean!
+    message: String
+    attendanceId: String!
+    checkOutTime: String!
+    totalWorkHours: Float!
+    noBreaksRegistered: Boolean!
+}
+
+type StartBreakResponse {
+    success: Boolean!
+    message: String
+    breakId: String
+    startTime: String!
+    allowedDurationMinutes: Int!
+}
+
+type EndBreakResponse {
+    success: Boolean!
+    message: String
+    endTime: String!
+    durationMinutes: Int!
+    isExceeded: Boolean!
+}

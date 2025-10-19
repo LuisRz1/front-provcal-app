@@ -32,8 +32,8 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_baseline_access_time_24"
-                android:tint="#18A558"
-                android:contentDescription="@string/ingreso" />
+                android:contentDescription="@string/ingreso"
+                app:tint="#18A558" />
 
             <TextView
                 android:id="@+id/txtHoraIngreso"
@@ -116,8 +116,8 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_baseline_access_time_24"
-                android:tint="#18A558"
-                android:contentDescription="@string/horas_totales" />
+                android:contentDescription="@string/horas_totales"
+                app:tint="#18A558" />
 
             <TextView
                 android:id="@+id/txtHorasTotales"

@@ -1,3 +1,4 @@
+// File: ui/home/CheckInBottomSheet.kt
 package com.sanna.provcalapp.ui.home
 
 import android.app.Dialog
@@ -22,8 +23,9 @@ class CheckInBottomSheet : BottomSheetDialogFragment() {
         val dialog = BottomSheetDialog(requireContext(), theme)
         dialog.setOnShowListener { di ->
             val d = di as BottomSheetDialog
-            val bottomSheet =
-                d.findViewById<FrameLayout>(com.google.android.material.R.id.design_bottom_sheet)
+            val bottomSheet = d.findViewById<FrameLayout>(
+                com.google.android.material.R.id.design_bottom_sheet
+            )
             bottomSheet?.let {
                 val behavior = BottomSheetBehavior.from(it)
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
@@ -37,10 +39,16 @@ class CheckInBottomSheet : BottomSheetDialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.bottom_sheet_swipe_checkin, container, false)
+    ): View = inflater.inflate(
+        R.layout.bottom_sheet_swipe_checkin,
+        container,
+        false
+    )
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val actionIsIngreso = requireArguments().getBoolean(ARG_IS_INGRESO, true)
+        val action = AttendanceAction.valueOf(
+            requireArguments().getString(ARG_ACTION, AttendanceAction.CHECK_IN.name)
+        )
 
         // Views
         val tvInstruction = view.findViewById<TextView>(R.id.tvInstruction)
@@ -51,10 +59,7 @@ class CheckInBottomSheet : BottomSheetDialogFragment() {
         val cardSwipe = view.findViewById<MaterialCardView>(R.id.cardSwipe)
 
         // Texto según acción
-        tvInstruction.text = getString(
-            if (actionIsIngreso) R.string.desliza_derecha_ingreso
-            else R.string.desliza_derecha_salida
-        )
+        tvInstruction.text = getInstructionText(action)
 
         // Cuando el layout ya tiene tamaño, calculamos el rango de movimiento
         cardSwipe.post {
@@ -63,16 +68,15 @@ class CheckInBottomSheet : BottomSheetDialogFragment() {
             val available = swipeContainer.width - paddingLeft - paddingRight - whiteCircle.width
             val maxTranslation = available.coerceAtLeast(0)
 
-            // posición inicial
+            // Posición inicial
             whiteCircle.translationX = 0f
             chevrons.translationX = 0f
 
-            // mover círculo & chevrons con el slider (invisible)
+            // Mover círculo & chevrons con el slider
             slider.addOnChangeListener { _, value, fromUser ->
                 if (fromUser) {
                     val t = (value / slider.valueTo) * maxTranslation
                     whiteCircle.translationX = t
-                    // centra los «»» dentro del círculo
                     chevrons.translationX = t + (whiteCircle.width - chevrons.width) / 2f - 2f
                 }
             }
@@ -80,12 +84,16 @@ class CheckInBottomSheet : BottomSheetDialogFragment() {
             val threshold = 95f
             slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
                 override fun onStartTrackingTouch(slider: Slider) {}
+
                 override fun onStopTrackingTouch(slider: Slider) {
                     if (slider.value >= threshold) {
                         // Confirmado
                         setFragmentResult(
                             REQ_CHECKIN,
-                            bundleOf(KEY_CONFIRMED to true, KEY_IS_INGRESO to actionIsIngreso)
+                            bundleOf(
+                                KEY_CONFIRMED to true,
+                                KEY_IS_INGRESO to (action == AttendanceAction.CHECK_IN)
+                            )
                         )
                         dismissAllowingStateLoss()
                     } else {
@@ -99,14 +107,29 @@ class CheckInBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
+    private fun getInstructionText(action: AttendanceAction): String {
+        return when (action) {
+            AttendanceAction.CHECK_IN ->
+                getString(R.string.desliza_derecha_ingreso)
+            AttendanceAction.CHECK_OUT ->
+                getString(R.string.desliza_derecha_salida)
+            AttendanceAction.START_BREAK ->
+                "Desliza para iniciar descanso →"
+            AttendanceAction.END_BREAK ->
+                "Desliza para finalizar descanso →"
+            AttendanceAction.START_BREAK_OR_CHECK_OUT ->
+                getString(R.string.desliza_derecha_salida)
+        }
+    }
+
     companion object {
         const val REQ_CHECKIN = "checkin_request"
         const val KEY_CONFIRMED = "confirmed"
         const val KEY_IS_INGRESO = "is_ingreso"
-        private const val ARG_IS_INGRESO = "arg_is_ingreso"
+        private const val ARG_ACTION = "arg_action"
 
-        fun newInstance(isIngreso: Boolean) = CheckInBottomSheet().apply {
-            arguments = bundleOf(ARG_IS_INGRESO to isIngreso)
+        fun newInstance(action: AttendanceAction) = CheckInBottomSheet().apply {
+            arguments = bundleOf(ARG_ACTION to action.name)
         }
     }
 }
