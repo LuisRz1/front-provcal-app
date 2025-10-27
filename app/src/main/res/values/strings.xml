@@ -6,6 +6,12 @@
     <string name="empleado">EMPLEADO</string>
     <string name="cerrar_sesion">Cerrar Sesión</string>
 
+    <string name="cd_welcome_pattern">Fondo de bienvenida</string>
+    <string name="cd_decorative">Decoración</string>
+    <string name="welcome_title">Bienvenido</string>
+    <string name="welcome_subtitle">Marca tu asistencia, no olvides revisar tu horario</string>
+    <string name="welcome_cta">Continuar</string>
+
     <string name="pantalla_en_construccion">Pantalla en construcción…</string>
     <string name="turnos_realizados">Turnos Realizados</string>
     <string name="solicitud_cambio_turno">Solicitud para cambio de turno</string>
