@@ -12,4 +12,13 @@
     <string name="desliza_derecha_ingreso">Desliza a la derecha para marcar ingreso →</string>
     <string name="desliza_derecha_salida">Desliza a la derecha para marcar salida →</string>
     <string name="podras_cancelar_antes">Puedes soltar antes del final para cancelar.</string>
+    <string name="desc_break_button">Botón de descanso</string>
+    <string name="iniciar_descanso">Iniciar Descanso</string>
+    <string name="finalizar_descanso">Finalizar Descanso</string>
+    <string name="logout">Cerrar Sesión</string>
+    <string name="logout_confirm_title">Confirmar cierre de sesión</string>
+    <string name="logout_confirm_message">¿Estás seguro que deseas cerrar sesión?</string>
+    <string name="cancel">Cancelar</string>
+    <string name="toma_un_break">Toma un break</string>
+    <string name="regresar_al_trabajo">Regresar al trabajo</string>
 </resources>
