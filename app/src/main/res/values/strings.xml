@@ -37,4 +37,6 @@
     <string name="medio_dia">Medio día</string>
     <string name="max_7_dias">El rango no puede superar 7 días.</string>
     <string name="rango_supera_dias">El rango excede los %1$d día(s) seleccionados.</string>
+
+    <string name="menu_mes">Menú del Mes</string>
 </resources>

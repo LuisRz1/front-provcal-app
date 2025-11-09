@@ -22,16 +22,21 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/nav_view"
-        android:layout_width="373dp"
-        android:layout_height="61dp"
+        android:layout_width="380dp"
+        android:layout_height="75dp"
         android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_bottom_nav"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+
+        android:background="@drawable/bg_bottom_nav"
+
         app:menu="@menu/bottom_nav_menu"
-        app:itemTextColor="@color/white"
-        app:itemIconTint="@color/white"/>
+        app:labelVisibilityMode="labeled"
+        app:itemIconTint="@color/bnv_icon_tint"
+        app:itemTextColor="@color/bnv_text_tint"
+        app:itemActiveIndicatorStyle="@style/Provcal.ActiveIndicator" />
+
 
     <fragment
         android:id="@+id/nav_host_fragment_activity_main"

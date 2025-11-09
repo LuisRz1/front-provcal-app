@@ -40,6 +40,11 @@ class DashboardFragment : Fragment() {
                 title = getString(R.string.solicitar_vacaciones),
                 iconRes = R.drawable.ic_beach_24,
                 navAction = R.id.action_navigation_dashboard_to_vacationsFragment
+            ),
+            DashboardOption(
+                title = getString(R.string.menu_mes),
+                iconRes = R.drawable.food_bank_24,
+                navAction = R.id.action_navigation_dashboard_to_menuFragment
             )
         )
 

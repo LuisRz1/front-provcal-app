@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_home">
+    app:startDestination="@id/navigation_home">
 
     <!-- HOME -->
     <fragment
@@ -29,6 +29,9 @@
         <action
             android:id="@+id/action_navigation_dashboard_to_vacationsFragment"
             app:destination="@id/vacationsFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_menuFragment"
+            app:destination="@id/menuFragment" />
     </fragment>
 
     <!-- NOTIFICATIONS -->
@@ -56,4 +59,10 @@
         android:name="com.sanna.provcalapp.ui.menu.VacationsFragment"
         android:label="Vacaciones"
         tools:layout="@layout/fragment_vacations" />
+
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.sanna.provcalapp.ui.menu.MenuFragment"
+        android:label="Menú del Mes"
+        tools:layout="@layout/fragment_menu" />
 </navigation>

@@ -22,4 +22,12 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
+    <style name="Provcal.ActiveIndicator" parent="">
+        <!-- color de la pastilla (verde más oscuro) -->
+        <item name="android:color">@color/green_700</item>
+        <!-- forma pill totalmente redondeada -->
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Material3.Corner.Full</item>
+    </style>
+
+
 </resources>
