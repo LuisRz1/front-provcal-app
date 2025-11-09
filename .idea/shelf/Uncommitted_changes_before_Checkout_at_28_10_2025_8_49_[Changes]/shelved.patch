@@ -1,0 +1,170 @@
+Index: app/src/main/res/layout/view_home_header.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<com.google.android.material.card.MaterialCardView\r\n    xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"72dp\"\r\n    android:layout_marginStart=\"16dp\"\r\n    android:layout_marginEnd=\"16dp\"\r\n    app:cardCornerRadius=\"16dp\"\r\n    app:cardUseCompatPadding=\"true\"\r\n    app:strokeWidth=\"0dp\">\r\n\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"match_parent\"\r\n        android:gravity=\"center_vertical\"\r\n        android:padding=\"12dp\"\r\n        android:orientation=\"horizontal\">\r\n\r\n        <!-- Avatar -->\r\n        <ImageView\r\n            android:id=\"@+id/ivAvatar\"\r\n            android:layout_width=\"40dp\"\r\n            android:layout_height=\"40dp\"\r\n            android:src=\"@drawable/ic_person_placeholder\"\r\n            android:contentDescription=\"@string/app_name\" />\r\n\r\n        <!-- Nombre + “código” (usaremos email como placeholder) -->\r\n        <LinearLayout\r\n            android:layout_width=\"0dp\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginStart=\"12dp\"\r\n            android:layout_weight=\"1\"\r\n            android:orientation=\"vertical\">\r\n\r\n            <TextView\r\n                android:id=\"@+id/tvUserName\"\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"\"\r\n                android:textStyle=\"bold\"\r\n                android:textColor=\"#2A3642\"\r\n                android:textSize=\"14sp\" />\r\n\r\n            <TextView\r\n                android:id=\"@+id/tvUserCode\"\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"\"\r\n                android:textColor=\"#7A8A99\"\r\n                android:textSize=\"12sp\" />\r\n        </LinearLayout>\r\n\r\n        <!-- Botoncito de acciones (decorativo) -->\r\n        <ImageView\r\n            android:id=\"@+id/ivQuickAction\"\r\n            android:layout_width=\"22dp\"\r\n            android:layout_height=\"22dp\"\r\n            android:src=\"@drawable/ic_sun\"\r\n            android:tint=\"#2A3642\"\r\n            android:contentDescription=\"@string/app_name\" />\r\n    </LinearLayout>\r\n</com.google.android.material.card.MaterialCardView>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/view_home_header.xml b/app/src/main/res/layout/view_home_header.xml
+--- a/app/src/main/res/layout/view_home_header.xml	
++++ b/app/src/main/res/layout/view_home_header.xml	
+@@ -25,7 +25,7 @@
+             android:src="@drawable/ic_person_placeholder"
+             android:contentDescription="@string/app_name" />
+ 
+-        <!-- Nombre + “código” (usaremos email como placeholder) -->
++        <!-- Nombre + “código”-->
+         <LinearLayout
+             android:layout_width="0dp"
+             android:layout_height="wrap_content"
+@@ -34,16 +34,16 @@
+             android:orientation="vertical">
+ 
+             <TextView
+-                android:id="@+id/tvUserName"
++                android:id="@+id/tvFullname"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+-                android:text=""
++                android:text="-"
+                 android:textStyle="bold"
+                 android:textColor="#2A3642"
+                 android:textSize="14sp" />
+ 
+             <TextView
+-                android:id="@+id/tvUserCode"
++                android:id="@+id/tvEmployeeId"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:text=""
+Index: app/src/main/java/com/sanna/provcalapp/ui/home/HomeFragment.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.sanna.provcalapp.ui.home\r\n\r\nimport android.content.res.ColorStateList\r\nimport android.graphics.Color\r\nimport android.os.Bundle\r\nimport android.os.Handler\r\nimport android.os.Looper\r\nimport android.view.HapticFeedbackConstants\r\nimport android.view.LayoutInflater\r\nimport android.view.View\r\nimport android.view.ViewGroup\r\nimport android.widget.ImageView\r\nimport android.widget.TextView\r\nimport android.widget.Toast\r\nimport androidx.fragment.app.Fragment\r\nimport androidx.lifecycle.lifecycleScope\r\nimport com.google.android.material.card.MaterialCardView\r\nimport com.sanna.provcalapp.R\r\nimport com.sanna.provcalapp.attendance.data.AttendanceRepository\r\nimport com.sanna.provcalapp.core.network.Graphql\r\nimport com.sanna.provcalapp.core.network.GraphqlClient\r\nimport com.sanna.provcalapp.databinding.FragmentHomeBinding\r\nimport kotlinx.coroutines.Dispatchers\r\nimport kotlinx.coroutines.launch\r\nimport kotlinx.coroutines.withContext\r\nimport java.text.SimpleDateFormat\r\nimport java.util.Date\r\nimport java.util.Locale\r\n\r\nclass HomeFragment : Fragment() {\r\n\r\n    private var _binding: FragmentHomeBinding? = null\r\n    private val binding get() = _binding!!\r\n\r\n    private var checkedIn = false\r\n\r\n    // Reloj en vivo\r\n    private val localeEsPe = Locale(\"es\", \"PE\")\r\n    private val timeFmt = SimpleDateFormat(\"hh:mm a\", localeEsPe)\r\n    private val dateFmt = SimpleDateFormat(\"dd MMM, yyyy - EEEE\", localeEsPe)\r\n\r\n    private val handler = Handler(Looper.getMainLooper())\r\n    private val tick = object : Runnable {\r\n        override fun run() {\r\n            updateClock()\r\n            handler.postDelayed(this, 1000L)\r\n        }\r\n    }\r\n\r\n    override fun onCreate(savedInstanceState: Bundle?) {\r\n        super.onCreate(savedInstanceState)\r\n        checkedIn = savedInstanceState?.getBoolean(\"checkedIn\") ?: false\r\n\r\n        // Asegúrate de setear el token VIGENTE una sola vez\r\n        if (Graphql.ACCESS_TOKEN == null) {\r\n            Graphql.ACCESS_TOKEN = \"PEGAR_AQUI_TU_TOKEN_VIGENTE\"\r\n        }\r\n    }\r\n\r\n    override fun onCreateView(\r\n        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?\r\n    ): View {\r\n        _binding = FragmentHomeBinding.inflate(inflater, container, false)\r\n        return binding.root\r\n    }\r\n\r\n    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {\r\n        super.onViewCreated(view, savedInstanceState)\r\n\r\n        // Nombre y email reales (token)\r\n        lifecycleScope.launch {\r\n            val user = withContext(Dispatchers.IO) { GraphqlClient().currentUser() }\r\n            binding.homeHeader.tvUserName.text = user?.fullName ?: getString(R.string.app_name)\r\n            binding.homeHeader.tvUserCode.text = user?.email ?: \"\"\r\n        }\r\n\r\n        // Reloj en vivo\r\n        updateClock()\r\n        handler.post(tick)\r\n\r\n        // Botón grande\r\n        val innerButton: MaterialCardView = view.findViewById(R.id.innerButton)\r\n        val icon: ImageView = view.findViewById(R.id.icTouch)\r\n        val label: TextView = view.findViewById(R.id.labelAttendance)\r\n        renderButtonState(icon, label)\r\n\r\n        // Listener para el resultado del bottom sheet\r\n        childFragmentManager.setFragmentResultListener(\r\n            CheckInBottomSheet.REQ_CHECKIN, viewLifecycleOwner\r\n        ) { _, bundle ->\r\n            val confirmed = bundle.getBoolean(CheckInBottomSheet.KEY_CONFIRMED, false)\r\n            val isIngreso = bundle.getBoolean(CheckInBottomSheet.KEY_IS_INGRESO, true)\r\n            if (!confirmed) return@setFragmentResultListener\r\n\r\n            if (isIngreso) {\r\n                // ====== INGRESO ======\r\n                lifecycleScope.launch(Dispatchers.IO) {\r\n                    val hora = AttendanceRepository().doCheckIn()\r\n                    withContext(Dispatchers.Main) {\r\n                        if (hora != null) {\r\n                            binding.homeStats.txtHoraIngreso.text = hora\r\n                            checkedIn = true\r\n                            renderButtonState(icon, label)\r\n                        } else {\r\n                            Toast.makeText(requireContext(),\r\n                                \"No se pudo registrar ingreso (token/location?)\",\r\n                                Toast.LENGTH_SHORT).show()\r\n                        }\r\n                    }\r\n                }\r\n            } else {\r\n                // ====== SALIDA ======\r\n                lifecycleScope.launch(Dispatchers.IO) {\r\n                    val result = AttendanceRepository().doCheckOut()\r\n                    withContext(Dispatchers.Main) {\r\n                        if (result != null) {\r\n                            val (horaSalida, totalHHmm) = result\r\n                            binding.homeStats.txtHoraSalida.text  = horaSalida\r\n                            binding.homeStats.txtHorasTotales.text = totalHHmm\r\n                            checkedIn = false\r\n                            renderButtonState(icon, label)\r\n                            Toast.makeText(requireContext(),\r\n                                \"Salida registrada\",\r\n                                Toast.LENGTH_SHORT).show()\r\n                        } else {\r\n                            Toast.makeText(requireContext(),\r\n                                \"No se pudo registrar salida (token/location?)\",\r\n                                Toast.LENGTH_SHORT).show()\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n\r\n            // feedback háptico\r\n            innerButton.performHapticFeedback(HapticFeedbackConstants.CONFIRM)\r\n        }\r\n\r\n        innerButton.setOnClickListener {\r\n            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)\r\n            it.animate().scaleX(0.94f).scaleY(0.94f).setDuration(90)\r\n                .withEndAction { it.animate().scaleX(1f).scaleY(1f).setDuration(90).start() }\r\n                .start()\r\n\r\n            CheckInBottomSheet.newInstance(!checkedIn)\r\n                .show(childFragmentManager, \"CheckInBottomSheet\")\r\n        }\r\n\r\n        // Limpia textos demo al inicio\r\n        binding.homeStats.txtHoraIngreso.text = \"—\"\r\n        binding.homeStats.txtHoraSalida.text  = \"—\"\r\n        binding.homeStats.txtHorasTotales.text = \"—\"\r\n    }\r\n\r\n    private fun renderButtonState(icon: ImageView, label: TextView) {\r\n        if (checkedIn) {\r\n            label.text = getString(R.string.salida)\r\n            icon.imageTintList = ColorStateList.valueOf(Color.parseColor(\"#F59E0B\"))\r\n        } else {\r\n            label.text = getString(R.string.ingreso)\r\n            icon.imageTintList = ColorStateList.valueOf(Color.parseColor(\"#18A558\"))\r\n        }\r\n    }\r\n\r\n    private fun updateClock() {\r\n        val now = Date()\r\n        binding.txtTime.text = timeFmt.format(now).uppercase(localeEsPe)\r\n        val dateText = dateFmt.format(now)\r\n        binding.txtDate.text = dateText.replaceFirstChar { it.titlecase(localeEsPe) }\r\n    }\r\n\r\n    override fun onSaveInstanceState(outState: Bundle) {\r\n        super.onSaveInstanceState(outState)\r\n        outState.putBoolean(\"checkedIn\", checkedIn)\r\n    }\r\n\r\n    override fun onDestroyView() {\r\n        super.onDestroyView()\r\n        handler.removeCallbacksAndMessages(null)\r\n        _binding = null\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/sanna/provcalapp/ui/home/HomeFragment.kt b/app/src/main/java/com/sanna/provcalapp/ui/home/HomeFragment.kt
+--- a/app/src/main/java/com/sanna/provcalapp/ui/home/HomeFragment.kt	
++++ b/app/src/main/java/com/sanna/provcalapp/ui/home/HomeFragment.kt	
+@@ -53,7 +53,7 @@
+ 
+         // Asegúrate de setear el token VIGENTE una sola vez
+         if (Graphql.ACCESS_TOKEN == null) {
+-            Graphql.ACCESS_TOKEN = "PEGAR_AQUI_TU_TOKEN_VIGENTE"
++            Graphql.ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NmIzNGEzMS1lZTc3LTQ1ZGItYTk3My02OWJkMGZhNDJkMmMiLCJlbWFpbCI6ImNvY2luYS5hbmFAcHJvdmNhbC5jb20iLCJyb2xlIjoiY29vayIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NjAzNzUzMDgsImlhdCI6MTc2MDM3MzUwOH0.tvvwSwrhnkzM0Ae1Gq6-xek7066f2HiUYl8Uw0AGIo4"
+         }
+     }
+ 
+@@ -67,11 +67,16 @@
+     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+         super.onViewCreated(view, savedInstanceState)
+ 
+-        // Nombre y email reales (token)
++        // Nombre y employee id reales (token)
+         lifecycleScope.launch {
+             val user = withContext(Dispatchers.IO) { GraphqlClient().currentUser() }
+-            binding.homeHeader.tvUserName.text = user?.fullName ?: getString(R.string.app_name)
+-            binding.homeHeader.tvUserCode.text = user?.email ?: ""
++
++            val nameFallback = binding.homeHeader.tvFullname.text // lo que definas en XML
++            binding.homeHeader.tvFullname.text = user?.fullName ?: nameFallback
++
++            // Código del empleado: primero employeeId, luego employee_id (por si tu schema usa snake)
++            val code = user?.employeeId ?: user?.employee_id ?: user?.email ?: ""
++            binding.homeHeader.tvEmployeeId.text = code
+         }
+ 
+         // Reloj en vivo
+Index: app/src/main/java/com/sanna/provcalapp/core/network/GraphqlClient.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.sanna.provcalapp.core.network\r\n\r\nimport android.content.ContentValues.TAG\r\nimport android.util.Log\r\nimport com.google.gson.Gson\r\nimport okhttp3.MediaType.Companion.toMediaType\r\nimport okhttp3.OkHttpClient\r\nimport okhttp3.Request\r\nimport okhttp3.RequestBody.Companion.toRequestBody\r\n\r\nobject Graphql {\r\n    const val ENDPOINT = \"http://10.0.2.2:8000/graphql\"\r\n\r\n    var ACCESS_TOKEN: String? = \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NmIzNGEzMS1lZTc3LTQ1ZGItYTk3My02OWJkMGZhNDJkMmMiLCJlbWFpbCI6ImNvY2luYS5hbmFAcHJvdmNhbC5jb20iLCJyb2xlIjoiY29vayIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NjAzNjA0NTgsImlhdCI6MTc2MDM1ODY1OH0.QXOCGtqentuEreImfw_Xebuwal80ByIXdPV82wx0hbM\"\r\n}\r\n\r\nclass GraphqlClient(\r\n    private val client: OkHttpClient = OkHttpClient(),\r\n    private val gson: Gson = Gson()\r\n) {\r\n    private fun requestFor(query: String): Request {\r\n        val media = \"application/json; charset=utf-8\".toMediaType()\r\n        val body = gson.toJson(mapOf(\"query\" to query)).toRequestBody(media)\r\n        return Request.Builder()\r\n            .url(Graphql.ENDPOINT)\r\n            .post(body)\r\n            .apply { Graphql.ACCESS_TOKEN?.let { addHeader(\"Authorization\", \"Bearer $it\") } }\r\n            .build()\r\n    }\r\n\r\n    private fun logErrorsIfAny(rawJson: String) {\r\n        try {\r\n            val base = gson.fromJson(rawJson, Map::class.java)\r\n            @Suppress(\"UNCHECKED_CAST\")\r\n            val errors = base[\"errors\"] as? List<Map<String, Any?>>\r\n            if (!errors.isNullOrEmpty()) {\r\n                val msgs = errors.mapNotNull { it[\"message\"]?.toString() }\r\n                Log.e(TAG, \"GraphQL errors: $msgs\")\r\n            }\r\n        } catch (_: Throwable) { }\r\n    }\r\n\r\n    // ========== currentUser ==========\r\n    fun currentUser(): CurrentUser? {\r\n        fun call(query: String): Pair<CurrentUser?, String?> {\r\n            val req = requestFor(query)\r\n            return client.newCall(req).execute().use { resp ->\r\n                if (!resp.isSuccessful) return@use null to \"HTTP ${resp.code}\"\r\n                val json = resp.body?.string() ?: return@use null to \"empty\"\r\n                val base = try { gson.fromJson(json, Map::class.java) } catch (_: Throwable) { null }\r\n                val errs = (base?.get(\"errors\") as? List<*>)?.joinToString { (it as Map<*,*>)[\"message\"].toString() }\r\n                val env = gson.fromJson(json, CurrentUserEnvelope::class.java)\r\n                (env.data?.currentUser) to errs\r\n            }\r\n        }\r\n\r\n        // 1) currentUser\r\n        val (cu, err1) = call(\"\"\"query { currentUser { id fullName email role } }\"\"\")\r\n        if (cu != null) return cu\r\n        if (err1?.contains(\"Cannot query field 'currentUser'\") == true) {\r\n            // 2) me (fallback por si tu schema usa 'me')\r\n            val (me, _) = call(\"\"\"query { me { id fullName email role } }\"\"\")\r\n            if (me != null) return me\r\n        }\r\n        // deja trazas en Logcat para entender el motivo\r\n        Log.e(\"GraphqlClient\", \"currentUser() failed: $err1\")\r\n        return null\r\n    }\r\n\r\n\r\n    // ========== mySchedule (si lo usas) ==========\r\n    fun mySchedule(): MyScheduleDto? {\r\n        val q = \"\"\"\r\n            query {\r\n              mySchedule {\r\n                shiftType\r\n                startTime\r\n                endTime\r\n                workingDaysNames\r\n                lateToleranceMinutes\r\n                totalHoursPerDay\r\n              }\r\n            }\r\n        \"\"\".trimIndent()\r\n        return client.newCall(requestFor(q)).execute().use { resp ->\r\n            if (!resp.isSuccessful) {\r\n                Log.e(TAG, \"HTTP ${resp.code} en mySchedule()\")\r\n                return@use null\r\n            }\r\n            val json = resp.body?.string() ?: return@use null\r\n            logErrorsIfAny(json)\r\n            val env = gson.fromJson(json, GqlEnvelopeMySchedule::class.java)\r\n            env.data?.mySchedule\r\n        }\r\n    }\r\n\r\n    // ========== asistencia de HOY (si la tienes en tu schema) ==========\r\n    fun todayAttendance(): TodayAttendanceDto? {\r\n        val q = \"\"\"\r\n            query {\r\n              myAttendanceToday {\r\n                checkInTime\r\n                checkOutTime\r\n                totalWorkedMinutes\r\n              }\r\n            }\r\n        \"\"\".trimIndent()\r\n        return client.newCall(requestFor(q)).execute().use { resp ->\r\n            if (!resp.isSuccessful) {\r\n                Log.e(TAG, \"HTTP ${resp.code} en todayAttendance()\")\r\n                return@use null\r\n            }\r\n            val json = resp.body?.string() ?: return@use null\r\n            logErrorsIfAny(json)\r\n            val env = gson.fromJson(json, GqlEnvelopeTodayAttendance::class.java)\r\n            env.data?.myAttendanceToday\r\n        }\r\n    }\r\n\r\n    // ====== checkIn: parámetros opcionales con fallback (Trujillo) ======\r\n    fun checkIn(\r\n        latitude: Double? = null,\r\n        longitude: Double? = null,\r\n        accuracy: Double? = null\r\n    ): CheckInPayload? {\r\n        val lat = latitude ?: -8.1116778\r\n        val lon = longitude ?: -79.0287578\r\n        val acc = accuracy ?: 10.0\r\n\r\n        val query = \"\"\"\r\n            mutation {\r\n              checkIn(input: {\r\n                latitude: $lat,\r\n                longitude: $lon,\r\n                accuracy: $acc\r\n              }) {\r\n                success\r\n                message\r\n                checkInTime\r\n                isLate\r\n                lateMinutes\r\n                isHoliday\r\n              }\r\n            }\r\n        \"\"\".trimIndent()\r\n\r\n        val media = \"application/json; charset=utf-8\".toMediaType()\r\n        val body  = gson.toJson(mapOf(\"query\" to query)).toRequestBody(media)\r\n\r\n        val req = Request.Builder()\r\n            .url(Graphql.ENDPOINT)\r\n            .post(body)\r\n            .apply { Graphql.ACCESS_TOKEN?.let { addHeader(\"Authorization\", \"Bearer $it\") } }\r\n            .build()\r\n\r\n        return client.newCall(req).execute().use { resp ->\r\n            if (!resp.isSuccessful) return null\r\n            val json = resp.body?.string() ?: return null\r\n            val env  = gson.fromJson(json, GqlEnvelopeCheckIn::class.java)\r\n            env.data?.checkIn\r\n        }\r\n    }\r\n\r\n    // ====== checkOut (envía lat/lon/accuracy y pide totalWorkHours) ======\r\n    fun checkOut(\r\n        latitude: Double? = null,\r\n        longitude: Double? = null,\r\n        accuracy: Double? = null\r\n    ): CheckOutPayload? {\r\n        val lat  = latitude  ?: -8.1116778   // fallback Trujillo\r\n        val lon  = longitude ?: -79.0287578\r\n        val acc  = accuracy  ?: 10.0\r\n\r\n        val query = \"\"\"\r\n        mutation {\r\n          checkOut(input: {\r\n            latitude: $lat,\r\n            longitude: $lon,\r\n            accuracy: $acc\r\n          }) {\r\n            success\r\n            message\r\n            checkOutTime\r\n            totalWorkHours\r\n            noBreaksRegistered\r\n          }\r\n        }\r\n    \"\"\".trimIndent()\r\n\r\n        val media = \"application/json; charset=utf-8\".toMediaType()\r\n        val body  = gson.toJson(mapOf(\"query\" to query)).toRequestBody(media)\r\n\r\n        val req = Request.Builder()\r\n            .url(Graphql.ENDPOINT)\r\n            .post(body)\r\n            .apply { Graphql.ACCESS_TOKEN?.let { addHeader(\"Authorization\", \"Bearer $it\") } }\r\n            .build()\r\n\r\n        return client.newCall(req).execute().use { resp ->\r\n            if (!resp.isSuccessful) return null\r\n            val json = resp.body?.string() ?: return null\r\n            val env  = gson.fromJson(json, GqlEnvelopeCheckOut::class.java)\r\n            env.data?.checkOut\r\n        }\r\n    }\r\n\r\n}
+===================================================================
+diff --git a/app/src/main/java/com/sanna/provcalapp/core/network/GraphqlClient.kt b/app/src/main/java/com/sanna/provcalapp/core/network/GraphqlClient.kt
+--- a/app/src/main/java/com/sanna/provcalapp/core/network/GraphqlClient.kt	
++++ b/app/src/main/java/com/sanna/provcalapp/core/network/GraphqlClient.kt	
+@@ -11,7 +11,7 @@
+ object Graphql {
+     const val ENDPOINT = "http://10.0.2.2:8000/graphql"
+ 
+-    var ACCESS_TOKEN: String? = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NmIzNGEzMS1lZTc3LTQ1ZGItYTk3My02OWJkMGZhNDJkMmMiLCJlbWFpbCI6ImNvY2luYS5hbmFAcHJvdmNhbC5jb20iLCJyb2xlIjoiY29vayIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NjAzNjA0NTgsImlhdCI6MTc2MDM1ODY1OH0.QXOCGtqentuEreImfw_Xebuwal80ByIXdPV82wx0hbM"
++    var ACCESS_TOKEN: String? = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5NmIzNGEzMS1lZTc3LTQ1ZGItYTk3My02OWJkMGZhNDJkMmMiLCJlbWFpbCI6ImNvY2luYS5hbmFAcHJvdmNhbC5jb20iLCJyb2xlIjoiY29vayIsInR5cGUiOiJhY2Nlc3MiLCJleHAiOjE3NjAzNzUzMDgsImlhdCI6MTc2MDM3MzUwOH0.tvvwSwrhnkzM0Ae1Gq6-xek7066f2HiUYl8Uw0AGIo4"
+ }
+ 
+ class GraphqlClient(
+@@ -42,29 +42,33 @@
+ 
+     // ========== currentUser ==========
+     fun currentUser(): CurrentUser? {
+-        fun call(query: String): Pair<CurrentUser?, String?> {
+-            val req = requestFor(query)
+-            return client.newCall(req).execute().use { resp ->
+-                if (!resp.isSuccessful) return@use null to "HTTP ${resp.code}"
+-                val json = resp.body?.string() ?: return@use null to "empty"
+-                val base = try { gson.fromJson(json, Map::class.java) } catch (_: Throwable) { null }
+-                val errs = (base?.get("errors") as? List<*>)?.joinToString { (it as Map<*,*>)["message"].toString() }
+-                val env = gson.fromJson(json, CurrentUserEnvelope::class.java)
+-                (env.data?.currentUser) to errs
+-            }
++        val query = """
++            query {
++              currentUser {
++                id
++                fullName
++                email
++                role
++                employeeId
++              }
++            }
++        """.trimIndent()
++
++        val body = gson.toJson(mapOf("query" to query))
++            .toRequestBody("application/json; charset=utf-8".toMediaType())
++
++        val req = Request.Builder()
++            .url(Graphql.ENDPOINT)
++            .post(body)
++            .apply { Graphql.ACCESS_TOKEN?.let { addHeader("Authorization", "Bearer $it") } }
++            .build()
++
++        return client.newCall(req).execute().use { resp ->
++            if (!resp.isSuccessful) return@use null
++            val json = resp.body?.string() ?: return@use null
++            val env = gson.fromJson(json, CurrentUserEnvelope::class.java)
++            env.data?.currentUser
+         }
+-
+-        // 1) currentUser
+-        val (cu, err1) = call("""query { currentUser { id fullName email role } }""")
+-        if (cu != null) return cu
+-        if (err1?.contains("Cannot query field 'currentUser'") == true) {
+-            // 2) me (fallback por si tu schema usa 'me')
+-            val (me, _) = call("""query { me { id fullName email role } }""")
+-            if (me != null) return me
+-        }
+-        // deja trazas en Logcat para entender el motivo
+-        Log.e("GraphqlClient", "currentUser() failed: $err1")
+-        return null
+     }
+ 
+ 
+Index: app/src/main/java/com/sanna/provcalapp/core/network/GraphqlModels.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.sanna.provcalapp.core.network\r\n\r\n// ========= currentUser =========\r\ndata class CurrentUserEnvelope(val data: CurrentUserData?, val errors: List<GqlError>? = null)\r\ndata class CurrentUserData(val currentUser: CurrentUser?)\r\ndata class CurrentUser(\r\n    val id: String,\r\n    val fullName: String,\r\n    val email: String,\r\n    val role: String\r\n)\r\n\r\n// ========= mySchedule (opcional) =========\r\ndata class MyScheduleData(val mySchedule: MyScheduleDto?)\r\ndata class MyScheduleDto(\r\n    val shiftType: String,\r\n    val startTime: String,\r\n    val endTime: String,\r\n    val workingDaysNames: List<String>,\r\n    val lateToleranceMinutes: Int,\r\n    val totalHoursPerDay: Double\r\n)\r\ndata class GqlEnvelopeMySchedule(val data: MyScheduleData?, val errors: List<GqlError>? = null)\r\n\r\n// ========= checkIn / checkOut =========\r\ndata class CheckInData(val checkIn: CheckInPayload?)\r\ndata class CheckOutData(val checkOut: CheckOutPayload?)\r\n\r\ndata class CheckInPayload(\r\n    val success: Boolean,\r\n    val message: String?,\r\n    val checkInTime: String?          // ISO-8601\r\n)\r\n\r\ndata class CheckOutPayload(\r\n    val success: Boolean,\r\n    val message: String?,\r\n    val checkOutTime: String?,   // ISO-8601\r\n    val totalWorkHours: Double?, // <-- OJO: horas en float, viene del backend\r\n    val noBreaksRegistered: Boolean? = null\r\n)\r\n\r\ndata class GqlEnvelopeCheckIn(\r\n    val data: CheckInData? = null,\r\n    val errors: List<GqlError>? = null\r\n)\r\n\r\ndata class GqlEnvelopeCheckOut(\r\n    val data: CheckOutData? = null,\r\n    val errors: List<GqlError>? = null\r\n)\r\n\r\n// ========= asistencia HOY =========\r\ndata class TodayAttendanceDto(\r\n    val checkInTime: String?,\r\n    val checkOutTime: String?,\r\n    val totalWorkedMinutes: Int?\r\n)\r\ndata class TodayAttendanceData(val myAttendanceToday: TodayAttendanceDto?)\r\ndata class GqlEnvelopeTodayAttendance(\r\n    val data: TodayAttendanceData?,\r\n    val errors: List<GqlError>? = null\r\n)\r\n\r\n// ========= errores GraphQL =========\r\ndata class GqlError(val message: String? = null)\r\n
+===================================================================
+diff --git a/app/src/main/java/com/sanna/provcalapp/core/network/GraphqlModels.kt b/app/src/main/java/com/sanna/provcalapp/core/network/GraphqlModels.kt
+--- a/app/src/main/java/com/sanna/provcalapp/core/network/GraphqlModels.kt	
++++ b/app/src/main/java/com/sanna/provcalapp/core/network/GraphqlModels.kt	
+@@ -7,7 +7,9 @@
+     val id: String,
+     val fullName: String,
+     val email: String,
+-    val role: String
++    val role: String,
++    val employeeId: String,
++    val employee_id: String
+ )
+ 
+ // ========= mySchedule (opcional) =========
