@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="32dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Botón cerrar -->
+        <TextView
+            android:id="@+id/btnClose"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:text="✕"
+            android:textSize="24sp"
+            android:textColor="#666666"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <!-- Día del mes -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardDay"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="#18A558"
+            app:cardElevation="0dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnClose">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tvDayNumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="08"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"/>
+
+                <TextView
+                    android:id="@+id/tvDayName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LUN"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- DESAYUNO -->
+        <TextView
+            android:id="@+id/tvDesayunoTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DESAYUNO"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#2A3642"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cardDay"/>
+
+        <LinearLayout
+            android:id="@+id/layoutDesayuno"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnCambiarDesayuno"
+            app:layout_constraintTop_toBottomOf="@id/tvDesayunoTitle">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sanguche de pollo"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"
+                android:layout_marginBottom="3dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Café pasado"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"
+                android:layout_marginBottom="3dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Manzana"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCambiarDesayuno"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Proponer cambio"
+            android:textSize="10sp"
+            app:icon="@drawable/ic_edit_24"
+            app:iconSize="14dp"
+            app:iconTint="#18A558"
+            android:textColor="#18A558"
+            app:strokeColor="#18A558"
+            app:strokeWidth="1dp"
+            app:cornerRadius="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/layoutDesayuno"
+            app:layout_constraintBottom_toBottomOf="@id/layoutDesayuno"/>
+
+        <!-- ALMUERZO -->
+        <TextView
+            android:id="@+id/tvAlmuerzoTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ALMUERZO"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#2A3642"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutDesayuno"/>
+
+        <LinearLayout
+            android:id="@+id/layoutAlmuerzo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnCambiarAlmuerzo"
+            app:layout_constraintTop_toBottomOf="@id/tvAlmuerzoTitle">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Arroz tapado"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"
+                android:layout_marginBottom="3dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Jugo de Maracuya"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"
+                android:layout_marginBottom="3dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ceviche"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCambiarAlmuerzo"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Proponer cambio"
+            android:textSize="10sp"
+            app:icon="@drawable/ic_edit_24"
+            app:iconSize="14dp"
+            app:iconTint="#18A558"
+            android:textColor="#18A558"
+            app:strokeColor="#18A558"
+            app:strokeWidth="1dp"
+            app:cornerRadius="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/layoutAlmuerzo"
+            app:layout_constraintBottom_toBottomOf="@id/layoutAlmuerzo"/>
+
+        <!-- CENA -->
+        <TextView
+            android:id="@+id/tvCenaTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CENA"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#2A3642"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutAlmuerzo"/>
+
+        <LinearLayout
+            android:id="@+id/layoutCena"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnCambiarCena"
+            app:layout_constraintTop_toBottomOf="@id/tvCenaTitle">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bistec a lo pobre"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"
+                android:layout_marginBottom="3dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gaseosa"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"
+                android:layout_marginBottom="3dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Pie de Manzana"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:background="#E8E8E8"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCambiarCena"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Proponer cambio"
+            android:textSize="10sp"
+            app:icon="@drawable/ic_edit_24"
+            app:iconSize="14dp"
+            app:iconTint="#18A558"
+            android:textColor="#18A558"
+            app:strokeColor="#18A558"
+            app:strokeWidth="1dp"
+            app:cornerRadius="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/layoutCena"
+            app:layout_constraintBottom_toBottomOf="@id/layoutCena"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

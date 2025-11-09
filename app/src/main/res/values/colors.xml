@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="green_500">#19AC54</color>
     <color name="green_acept">#19AC54</color>
+    <color name="fondosForm">#EFEFEF</color>
+    <color name="yelow">#E89C1E</color>
+    <color name="green_700">#157F40</color>
 </resources>
