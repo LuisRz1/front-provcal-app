@@ -7,6 +7,7 @@ plugins {
 apollo {
     service("service") {
         packageName.set("com.sanna.provcalapp")
+        mapScalar("Date", "kotlin.String")
         // URL de tu backend GraphQL
         schemaFile.set(file("src/main/graphql/schema.graphqls"))
     }
@@ -57,7 +58,7 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
-        buildConfig = true  // Para usar BuildConfig
+        buildConfig = true
     }
 }
 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Alias para compatibilidad: donde alguien use @style/Provcal, apuntará a tu tema real -->
+    <style name="Provcal" parent="Theme.ProvcalApp"/>
+</resources>

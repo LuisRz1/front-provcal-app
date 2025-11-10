@@ -124,3 +124,69 @@ type EndBreakResponse {
     durationMinutes: Int!
     isExceeded: Boolean!
 }
+
+# ===========================
+# Menu
+# ===========================
+
+scalar Date
+
+type MenuDayInfo {
+  id: ID!
+  date: Date!
+  breakfast: String!
+  lunch: String!
+  dinner: String!
+  isHoliday: Boolean!
+}
+
+type MonthlyMenuCalendar {
+  year: Int!
+  month: Int!
+  days: [MenuDayInfo!]!
+}
+
+type UploadMenuResponse {
+  status: String!
+  message: String!
+}
+
+type ConfirmOverwriteResponse {
+  status: String!
+  message: String!
+}
+
+type MenuChangeInfo {
+  id: ID!
+  status: String!
+}
+
+input UploadMonthlyMenuInput {
+  year: Int!
+  month: Int!
+  filename: String!
+  fileBase64: String!
+}
+
+input MenuChangeItemInput {
+  menuDayId: ID!
+  day: Date!
+  mealType: String!
+  newValue: String!
+  reason: String!
+  emergency: Boolean!
+}
+
+input ProposeMenuChangeInput {
+  items: [MenuChangeItemInput!]!
+}
+
+extend type Query {
+  menu(year: Int!, month: Int!): MonthlyMenuCalendar
+}
+
+extend type Mutation {
+  uploadMonthlyMenu(input: UploadMonthlyMenuInput!): UploadMenuResponse!
+  confirmOverwriteMenu(input: UploadMonthlyMenuInput!): ConfirmOverwriteResponse!
+  proposeMenuChange(input: ProposeMenuChangeInput!): [MenuChangeInfo!]!
+}
