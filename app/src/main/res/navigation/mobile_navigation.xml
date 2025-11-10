@@ -63,6 +63,6 @@
     <fragment
         android:id="@+id/menuFragment"
         android:name="com.sanna.provcalapp.ui.menu.MenuFragment"
-        android:label="Menú del Mes"
-        tools:layout="@layout/fragment_menu" />
+        android:label="@string/menu_mes" />
+
 </navigation>

@@ -29,7 +29,9 @@
     <string name="turnos_realizados">Turnos Realizados</string>
     <string name="breadcrumb_vacaciones">Menú &gt; Solicitar Vacaciones/Días Libre</string>
 
+    <string name="solicitar_vacaciones">Solicitar Vacaciones/Días Libres</string>
     <string name="solicitud_cambio_turno">Solicitud para cambio de turno</string>
+    <string name="menu_mes">Menú del Mes</string>
     <string name="tipo_solicitud">Tipo de solicitud</string>
 
     <string name="dias">Días</string>
@@ -46,5 +48,11 @@
 
     <string name="max_7_dias">El rango no puede superar 7 días.</string>
     <string name="rango_supera_dias">El rango excede los %1$d día(s) seleccionados.</string>
+
+    <string name="cd_welcome_pattern">Fondo de bienvenida</string>
+    <string name="cd_decorative">Decoración</string>
+    <string name="welcome_title">Bienvenido</string>
+    <string name="welcome_subtitle">Marca tu asistencia, no olvides revisar tu horario</string>
+    <string name="welcome_cta">Continuar</string>
 
 </resources>

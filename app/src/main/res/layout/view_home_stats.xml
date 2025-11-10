@@ -74,7 +74,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_baseline_access_time_24"
-                android:tint="#F59E0B"
+                app:tint="#F59E0B"
                 android:contentDescription="@string/salida" />
 
             <TextView

@@ -109,7 +109,13 @@ class MenuFragment : Fragment() {
         menuData.clear()
 
         fun splitList(s: String?): MutableList<String> =
-            (s ?: "").split(",").map { it.trim() }.filter { it.isNotEmpty() }.toMutableList()
+        (s ?: "")
+            .trim()
+            .trim('"') // por si viene entre comillas del CSV
+            .split(Regex("\\s*[|,;]\\s*")) // separa por | o ,
+            .filter { it.isNotEmpty() }
+            .toMutableList()
+
 
         for (d in days) {
             val dayNum = try { d.date.substring(8, 10).toInt() } catch (_: Exception) { continue }
@@ -224,6 +230,28 @@ class MenuFragment : Fragment() {
         dialog.show()
     }
 
+    private fun buildMealItemView(text: String): TextView {
+        return TextView(requireContext()).apply {
+            this.text = text
+            textSize = 12f
+            setTextColor(Color.parseColor("#666666"))
+            setBackgroundColor(Color.parseColor("#E8E8E8"))
+            setPadding(8, 8, 8, 8)
+            val lp = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            lp.setMargins(0, 0, 0, 6)
+            layoutParams = lp
+        }
+    }
+
+    private fun renderMeal(layout: LinearLayout, items: List<String>) {
+        layout.removeAllViews()
+        val list = if (items.isEmpty()) listOf("—") else items
+        list.forEach { layout.addView(buildMealItemView(it)) }
+    }
+
     private fun setupMenuItems(dialog: Dialog, day: Int) {
         val layoutDesayuno = dialog.findViewById<LinearLayout>(R.id.layoutDesayuno)
         val btnCambiarDesayuno = dialog.findViewById<MaterialButton>(R.id.btnCambiarDesayuno)
@@ -232,6 +260,13 @@ class MenuFragment : Fragment() {
         val layoutCena = dialog.findViewById<LinearLayout>(R.id.layoutCena)
         val btnCambiarCena = dialog.findViewById<MaterialButton>(R.id.btnCambiarCena)
 
+        // 👉 RELLENAR CON LOS DATOS QUE YA LLEGARON DEL BACKEND
+        val dayData = menuData[day]
+        renderMeal(layoutDesayuno, dayData?.desayuno ?: emptyList())
+        renderMeal(layoutAlmuerzo, dayData?.almuerzo ?: emptyList())
+        renderMeal(layoutCena,     dayData?.cena     ?: emptyList())
+
+        // Botones de edición / propuesta de cambio
         btnCambiarDesayuno.setOnClickListener {
             toggleEditMeal(layoutDesayuno, btnCambiarDesayuno) { nuevos ->
                 proposeFor(day, "breakfast", nuevos.joinToString(", "))
@@ -297,6 +332,7 @@ class MenuFragment : Fragment() {
     }
 
     // ----- File picker -----
+    // ----- File picker -----
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -304,14 +340,23 @@ class MenuFragment : Fragment() {
             putExtra(
                 Intent.EXTRA_MIME_TYPES,
                 arrayOf(
+                    // Excel
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     "application/vnd.ms-excel",
-                    "text/csv"
+                    // CSV (variantes reales que reportan muchos proveedores)
+                    "text/csv",
+                    "text/comma-separated-values",
+                    "text/x-comma-separated-values",
+                    "text/plain",
+                    "application/csv",
+                    "application/x-csv",
+                    "application/octet-stream"
                 )
             )
         }
         filePickerLauncher.launch(intent)
     }
+
 
     private fun handleSelectedFile(uri: Uri) {
         val y = calendar.get(Calendar.YEAR)

@@ -43,6 +43,11 @@ class TokenManager(context: Context) {
 
     fun getUserName(): String? = prefs.getString(KEY_USER_NAME, null)
     fun getEmployeeId(): String? = prefs.getString(KEY_EMPLOYEE_ID, null)
+    fun getRole(): String? = prefs.getString(KEY_USER_ROLE, null)
+
+    fun setRole(role: String) {
+        prefs.edit().putString(KEY_USER_ROLE, role).apply()
+    }
 
     fun clearTokens() {
         prefs.edit().clear().apply()

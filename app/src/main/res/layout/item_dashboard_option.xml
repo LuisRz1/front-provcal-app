@@ -21,13 +21,13 @@
             android:layout_height="64dp"
             android:background="@drawable/bg_icon_pill">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivIcon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:tint="#393737"
-                android:src="@drawable/ic_calendar_24"/>
+                android:src="@drawable/ic_calendar_24"
+                android:tint="#393737" />
         </FrameLayout>
 
         <TextView
