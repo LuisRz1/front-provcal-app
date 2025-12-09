@@ -36,6 +36,8 @@ class DashboardFragment : Fragment() {
             when (option.key) {
                 "menu_mes" -> findNavController()
                     .navigate(R.id.action_navigation_dashboard_to_menuFragment)
+                "sanitary_control" -> findNavController()
+                    .navigate(R.id.action_navigation_dashboard_to_sanitaryControlMenu)
                 else -> {
                     // Placeholder: luego navegas a los demás destinos si quieres
                     Toast.makeText(requireContext(), getString(option.titleRes), Toast.LENGTH_SHORT).show()
@@ -61,6 +63,7 @@ class DashboardFragment : Fragment() {
 
         if (isNutritionist) {
             options += DashboardOption("menu_mes", R.string.menu_mes, R.drawable.ic_person_placeholder)
+            options += DashboardOption("sanitary_control", R.string.sanitary_control, R.drawable.ic_pest_control)
         }
 
         adapter.submit(options)

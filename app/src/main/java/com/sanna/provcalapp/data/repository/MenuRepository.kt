@@ -9,9 +9,12 @@ import com.sanna.provcalapp.type.*
 import com.sanna.provcalapp.data.models.Result
 import com.sanna.provcalapp.data.remote.ApolloClientProvider
 
-class MenuRepository(context: Context) {
+class MenuRepository(
+    context: Context? = null,
+    apolloClient: ApolloClient? = null
+) {
 
-    private val apolloClient: ApolloClient = ApolloClientProvider.getInstance(context)
+    private val apolloClient: ApolloClient = apolloClient ?: ApolloClientProvider.getInstance(context!!)
 
     suspend fun getMonthlyMenu(year: Int, month: Int): Result<MonthlyMenuQuery.Menu> {
         return try {

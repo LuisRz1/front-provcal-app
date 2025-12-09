@@ -55,4 +55,56 @@
     <string name="welcome_subtitle">Marca tu asistencia, no olvides revisar tu horario</string>
     <string name="welcome_cta">Continuar</string>
 
+    <!-- Sanitary Control / Health Policy -->
+    <string name="sanitary_control">Políticas Sanitarias</string>
+    <string name="policies">Políticas</string>
+    <string name="pest_control">Control de Plagas</string>
+    <string name="waste_management">Manejo de Residuos</string>
+    <string name="dining_sanitation">Saneamiento del Comedor</string>
+
+    <string name="next_revision">Próxima revisión</string>
+    <string name="schedule_revision">Revisión</string>
+    <string name="scheduled_for">programada para el</string>
+    <string name="confirm_revision_title">¿Está seguro de realizar la revisión?</string>
+    <string name="revision_scheduled_for">La revisión está programada para el %1$s</string>
+    <string name="continue_action">Continuar</string>
+
+    <string name="history">Historial</string>
+    <string name="filter_6_months">6 meses</string>
+    <string name="filter_1_year">1 año</string>
+    <string name="filter_2_years">2 años</string>
+
+    <string name="conforme">Conforme</string>
+    <string name="inconforme">Inconforme</string>
+    <string name="result">Resultado</string>
+    <string name="comment">Comentario</string>
+    <string name="comment_hint">Comentario...</string>
+    <string name="save">Guardar</string>
+
+    <string name="incident_type">Tipo de incidencia</string>
+    <string name="incident_comment">Comentario de la incidencia</string>
+    <string name="incident_comment_hint">Comentario...</string>
+    <string name="company_to_contact">Empresa a contactar</string>
+    <string name="company_contact">Contacto de la empresa</string>
+    <string name="search_company">Buscar empresa especializada...</string>
+
+    <string name="observations">Observaciones</string>
+    <string name="observation_date">%1$s de %2$s</string>
+
+    <string name="revision_saved">Revisión guardada exitosamente</string>
+    <string name="revision_error">Error al guardar revisión</string>
+    <string name="loading">Cargando...</string>
+    <string name="no_history">No hay historial disponible</string>
+    <string name="no_companies">No hay empresas disponibles</string>
+
+    <string name="field_required">Campo requerido</string>
+    <string name="select_option">Seleccione una opción</string>
+    <string name="select_company">Seleccione una empresa</string>
+    <string name="select_incident_type">Seleccione tipo de incidencia</string>
+
+    <string name="breadcrumb_sanitary">Menú &gt; Políticas Sanitarias</string>
+    <string name="breadcrumb_policy_management">Políticas &gt; %1$s</string>
+
+    <string name="date_format">Fecha</string>
+
 </resources>

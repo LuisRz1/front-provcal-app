@@ -32,6 +32,9 @@
         <action
             android:id="@+id/action_navigation_dashboard_to_menuFragment"
             app:destination="@id/menuFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_sanitaryControlMenu"
+            app:destination="@id/sanitaryControlMenuFragment" />
     </fragment>
 
     <!-- NOTIFICATIONS -->
@@ -64,5 +67,66 @@
         android:id="@+id/menuFragment"
         android:name="com.sanna.provcalapp.ui.menu.MenuFragment"
         android:label="@string/menu_mes" />
+
+    <!-- SANITARY CONTROL (HEALTH POLICY) -->
+    <fragment
+        android:id="@+id/sanitaryControlMenuFragment"
+        android:name="com.sanna.provcalapp.ui.sanitary.SanitaryControlMenuFragment"
+        android:label="@string/sanitary_control"
+        tools:layout="@layout/fragment_sanitary_control_menu">
+
+        <action
+            android:id="@+id/actionSanitaryControlMenuToPolicyManagement"
+            app:destination="@id/policyManagementFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/policyManagementFragment"
+        android:name="com.sanna.provcalapp.ui.sanitary.PolicyManagementFragment"
+        android:label="@string/policies">
+
+        <argument
+            android:name="policyId"
+            app:argType="string" />
+        <argument
+            android:name="policyName"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_policyManagement_to_revisionForm"
+            app:destination="@id/revisionFormFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/revisionFormFragment"
+        android:name="com.sanna.provcalapp.ui.sanitary.RevisionFormFragment"
+        android:label="Revisión"
+        tools:layout="@layout/fragment_revision_form">
+
+        <argument
+            android:name="policyId"
+            app:argType="string" />
+        <argument
+            android:name="policyName"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_revisionForm_to_incidentReport"
+            app:destination="@id/incidentReportFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/incidentReportFragment"
+        android:name="com.sanna.provcalapp.ui.sanitary.IncidentReportFragment"
+        android:label="Reporte de Incidencia"
+        tools:layout="@layout/fragment_incident_report">
+
+        <argument
+            android:name="policyId"
+            app:argType="string" />
+        <argument
+            android:name="policyName"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

@@ -12,4 +12,12 @@
     <color name="green_700">#157F40</color>
     <color name="fondosForm">#EFEFEF</color>
     <color name="yelow">#E89C1E</color>
+
+    <!-- Sanitary Control Status Colors -->
+    <color name="status_conforme">#19AC54</color>
+    <color name="status_inconforme">#E53935</color>
+    <color name="status_pending">#E89C1E</color>
+    <color name="gray_cancel">#9E9E9E</color>
+    <color name="gray_text">#757575</color>
+    <color name="light_gray_background">#F5F5F5</color>
 </resources>

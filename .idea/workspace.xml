@@ -30,6 +30,11 @@
           <theme>@style/Theme.ProvcalApp</theme>
         </config>
       </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_confirmation.xml">
+        <config>
+          <theme>@style/Theme.ProvcalApp</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/dialog_menu_day.xml">
         <config>
           <theme>@style/Theme.ProvcalApp</theme>
@@ -56,6 +61,21 @@
         </config>
       </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_notifications.xml">
+        <config>
+          <theme>@style/Theme.ProvcalApp</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_policy_management.xml">
+        <config>
+          <theme>@style/Theme.ProvcalApp</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_revision_form.xml">
+        <config>
+          <theme>@style/Theme.ProvcalApp</theme>
+        </config>
+      </layout>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/fragment_sanitary_control_menu.xml">
         <config>
           <theme>@style/Theme.ProvcalApp</theme>
         </config>
@@ -127,28 +147,77 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b6358ab2-881b-440f-a37c-fd1afc24c235" name="Changes" comment="INTEGRATION NUTRITION AND LOGIN">
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/dashboard/DashboardAdapter.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/dashboard/DashboardOption.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/login/LoginActivity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/welcome/WelcomeActivity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_welcome.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/navigation/nav_graph_login.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/data/local/SanitaryControlManager.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/data/models/SanitaryControlData.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/data/repository/SanitaryControlRepository.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/IncidentReportFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/IncidentReportViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/PolicyManagementFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/PolicyManagementViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/PolicyMenuAdapter.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/RevisionFormFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/RevisionFormViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/RevisionHistoryAdapter.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/SanitaryControlMenuFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/sanitary/SanitaryControlViewModel.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/color/chip_background_color.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/color/chip_text_color.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bg_button_cancel.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bg_button_continue.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bg_close_button.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bg_incident_badge.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bg_month_badge_green.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bg_month_badge_red.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/bg_text_field.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_arrow_back.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_arrow_forward.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_check_circle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_dining_sanitation.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_document.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_pest_control.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_warning_circle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/drawable/ic_waste_management.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_confirmation.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/dialog_observation.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_incident_report.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_policy_management.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_revision_form.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_sanitary_control_menu.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_policy_card.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_revision_history.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/sanna/provcalapp/data/repository/MenuRepositoryTest.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/sanna/provcalapp/data/repository/MenuRepositoryTest.kt.bak" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/sanna/provcalapp/ui/menu/MenuViewModelTest.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/sanna/provcalapp/utils/LiveDataTestUtil.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/sanna/provcalapp/utils/MainCoroutineRule.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/test/java/com/sanna/provcalapp/utils/MenuTestData.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/ER_provcal.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/Screenshot 2025-12-09 at 12.33.13 PM.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/Screenshot 2025-12-09 at 2.06.47 PM.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/UH-NU1-Object-Diagram.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/UH-NU1-Resumen-Pruebas.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/UH-NU1-Testing-Summary.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/compare_views.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/confirmation_popup.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/observation_popup.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/politics_menu.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/politycs_design_view.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/popup_confirmation.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/sanitary_interfaces.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_51_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_51__Changes_.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_52_[Changes]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_52__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/MainActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/data/local/TokenManager.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/data/local/TokenManager.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/graphql/operations.graphql" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/graphql/operations.graphql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/graphql/schema.graphqls" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/graphql/schema.graphqls" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/data/repository/MenuRepository.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/data/repository/MenuRepository.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/dashboard/DashboardFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/dashboard/DashboardFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/login/LoginFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/login/LoginFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/menu/MenuFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/menu/MenuFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_login.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_login.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_dashboard.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_dashboard.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_login.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_login.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/item_dashboard_option.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/item_dashboard_option.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/view_home_stats.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/view_home_stats.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/navigation/mobile_navigation.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/navigation/mobile_navigation.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/colors.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -158,7 +227,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\Daniel R\.android\avd\Medium_Phone_API_24.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=/Users/harryjosecastrorodriguez/.android/avd/Medium_Phone.avd)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -236,9 +305,6 @@
     &quot;accountId&quot;: &quot;245b5bfb-d3cf-4e3a-aeed-108cb8fe0660&quot;
   }
 }</component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$USER_HOME$/AppData/Local/Google/AndroidStudio2025.1.4/device-explorer/Medium Phone API 24/_/sdcard/Download/menu_template_en.csv" root0="FORCE_HIGHLIGHTING" />
-  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -260,6 +326,11 @@
   "keyToString": {
     "ASKED_ADD_EXTERNAL_FILES": "true",
     "Android App.app.executor": "Run",
+    "Gradle./Users/harryjosecastrorodriguez/AndroidStudioProjects/front-provcal-app/docs [testDebugUnitTest --tests \"MenuRepositoryTest\"].executor": "Run",
+    "Gradle./Users/harryjosecastrorodriguez/AndroidStudioProjects/front-provcal-app/docs [testDebugUnitTest].executor": "Run",
+    "Gradle.MenuRepositoryTest.getMonthlyMenu returns Error on network exception.executor": "Run",
+    "Gradle.MenuViewModelTest.proposeChanges invokes onDone callback with correct count.executor": "Run",
+    "Gradle.MenuViewModelTest.proposeChanges updates message with success count.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
@@ -269,7 +340,7 @@
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
     "com.google.services.firebase.aqiPopupShown": "true",
-    "git-widget-placeholder": "feature/integration-UHN1",
+    "git-widget-placeholder": "feature/sanitary-politics",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Daniel R/AndroidStudioProjects/front-provcal-app",
     "settings.editor.selected.configurable": "advanced.settings"
@@ -280,6 +351,7 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/docs" />
       <recent name="C:\Users\Daniel R\AndroidStudioProjects\front-provcal-app\app\src\main\res\navigation" />
     </key>
     <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
@@ -289,7 +361,7 @@
       <recent name="com.sanna.provcalapp.ui.welcome" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Android App.app">
     <configuration name="app" type="AndroidRunConfigurationType" factoryName="Android App" activateToolWindowBeforeRun="false">
       <module name="ProvcalApp.app" />
       <option name="ANDROID_RUN_CONFIGURATION_SCHEMA_VERSION" value="1" />
@@ -362,6 +434,133 @@
         <option name="Android.Gradle.BeforeRunTask" enabled="true" />
       </method>
     </configuration>
+    <configuration name="MenuRepositoryTest.getMonthlyMenu returns Error on network exception" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":app:testDebugUnitTest" />
+            <option value="--tests" />
+            <option value="&quot;com.sanna.provcalapp.data.repository.MenuRepositoryTest.getMonthlyMenu returns Error on network exception&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="MenuViewModelTest.proposeChanges invokes onDone callback with correct count" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":app:testDebugUnitTest" />
+            <option value="--tests" />
+            <option value="&quot;com.sanna.provcalapp.ui.menu.MenuViewModelTest.proposeChanges invokes onDone callback with correct count&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="MenuViewModelTest.proposeChanges updates message with success count" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":app:testDebugUnitTest" />
+            <option value="--tests" />
+            <option value="&quot;com.sanna.provcalapp.ui.menu.MenuViewModelTest.proposeChanges updates message with success count&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="/Users/harryjosecastrorodriguez/AndroidStudioProjects/front-provcal-app/docs [testDebugUnitTest --tests &quot;MenuRepositoryTest&quot;]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/docs" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="testDebugUnitTest" />
+            <option value="--tests" />
+            <option value="&quot;MenuRepositoryTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="/Users/harryjosecastrorodriguez/AndroidStudioProjects/front-provcal-app/docs [testDebugUnitTest]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/docs" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="testDebugUnitTest" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle./Users/harryjosecastrorodriguez/AndroidStudioProjects/front-provcal-app/docs [testDebugUnitTest --tests &quot;MenuRepositoryTest&quot;]" />
+        <item itemvalue="Gradle.MenuViewModelTest.proposeChanges invokes onDone callback with correct count" />
+        <item itemvalue="Gradle./Users/harryjosecastrorodriguez/AndroidStudioProjects/front-provcal-app/docs [testDebugUnitTest]" />
+        <item itemvalue="Gradle.MenuViewModelTest.proposeChanges updates message with success count" />
+        <item itemvalue="Gradle.MenuRepositoryTest.getMonthlyMenu returns Error on network exception" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -470,12 +669,12 @@
       <map>
         <entry key="com.sanna.provcalapp">
           <value>
-            <CheckInfo lastCheckTimestamp="1762724065921" />
+            <CheckInfo lastCheckTimestamp="1765284918263" />
           </value>
         </entry>
         <entry key="com.sanna.provcalapp.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1762724065920" />
+            <CheckInfo lastCheckTimestamp="1765284918262" />
           </value>
         </entry>
       </map>

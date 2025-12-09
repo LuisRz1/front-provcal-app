@@ -152,3 +152,99 @@ mutation ProposeMenuChange($input: ProposeMenuChangeInput!) {
     status
   }
 }
+
+# ============================================
+# SANITARY CONTROL (HEALTH POLICY)
+# ============================================
+# Uncomment when backend is ready
+
+# query GetHealthPolicies {
+#   healthPolicies {
+#     id
+#     name
+#     description
+#     type
+#     isActive
+#   }
+# }
+
+# query GetRevisionHistory($policyId: ID!, $filterMonths: Int) {
+#   revisionHistory(policyId: $policyId, filterMonths: $filterMonths) {
+#     id
+#     date
+#     monthLabel
+#     isConforme
+#     observation
+#     incidentType
+#     company {
+#       id
+#       socialReason
+#       phone
+#       email
+#       serviceType
+#     }
+#     hasIncident
+#   }
+# }
+
+# query GetNextRevisionDate($policyId: ID!) {
+#   nextRevisionDate(policyId: $policyId)
+# }
+
+# query GetRevisionById($revisionId: ID!) {
+#   revisionById(revisionId: $revisionId) {
+#     id
+#     policyId
+#     userId
+#     date
+#     isConforme
+#     observation
+#     incidentTypeId
+#     companyId
+#     createdAt
+#   }
+# }
+
+# query GetCompanies($serviceType: String) {
+#   companies(serviceType: $serviceType) {
+#     id
+#     socialReason
+#     ruc
+#     phone
+#     email
+#     serviceType
+#   }
+# }
+
+# query GetCompanyById($companyId: ID!) {
+#   companyById(companyId: $companyId) {
+#     id
+#     socialReason
+#     ruc
+#     phone
+#     email
+#     serviceType
+#   }
+# }
+
+# query GetIncidentTypes($policyId: ID!) {
+#   incidentTypes(policyId: $policyId) {
+#     id
+#     policyId
+#     name
+#     description
+#   }
+# }
+
+# mutation ScheduleRevision($policyId: ID!, $date: Date!) {
+#   scheduleRevision(policyId: $policyId, date: $date)
+# }
+
+# mutation SubmitRevision($input: SubmitRevisionInput!) {
+#   submitRevision(input: $input) {
+#     success
+#     message
+#     revisionId
+#     nextRevisionDate
+#   }
+# }

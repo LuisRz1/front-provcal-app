@@ -1,0 +1,551 @@
+package com.sanna.provcalapp.data.repository
+
+import android.content.Context
+import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.ApolloResponse
+import com.apollographql.apollo.api.Error
+import com.apollographql.apollo.exception.ApolloException
+import com.sanna.provcalapp.ConfirmOverwriteMonthlyMenuMutation
+import com.sanna.provcalapp.MonthlyMenuQuery
+import com.sanna.provcalapp.ProposeMenuChangeMutation
+import com.sanna.provcalapp.UploadMonthlyMenuMutation
+import com.sanna.provcalapp.data.models.Result
+import com.sanna.provcalapp.data.remote.ApolloClientProvider
+import com.sanna.provcalapp.type.MenuChangeItemInput
+import com.sanna.provcalapp.type.ProposeMenuChangeInput
+import com.sanna.provcalapp.type.UploadMonthlyMenuInput
+import com.sanna.provcalapp.utils.MenuTestData
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
+
+class MenuRepositoryTest {
+
+    private lateinit var repository: MenuRepository
+    private lateinit var mockApolloClient: ApolloClient
+    private lateinit var mockContext: Context
+
+    @Before
+    fun setup() {
+        mockContext = mockk(relaxed = true)
+        mockApolloClient = mockk()
+
+        // Mock the ApolloClientProvider singleton
+        mockkObject(ApolloClientProvider)
+        every { ApolloClientProvider.getInstance(any()) } returns mockApolloClient
+
+        repository = MenuRepository(mockContext)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
+    }
+
+    // ========================================
+    // getMonthlyMenu() Tests
+    // ========================================
+
+    @Test
+    fun `getMonthlyMenu returns Success when API call succeeds with valid data`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<MonthlyMenuQuery.Data>>(relaxed = true)
+        val mockData = mockk<MonthlyMenuQuery.Data>(relaxed = true)
+
+        coEvery { mockApolloClient.query(any<MonthlyMenuQuery>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.menu } returns MenuTestData.mockMenu
+
+        // When
+        val result = repository.getMonthlyMenu(MenuTestData.testYear, MenuTestData.testMonth)
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals(MenuTestData.mockMenu, (result as Result.Success).data)
+        coVerify(exactly = 1) { mockApolloClient.query(any<MonthlyMenuQuery>()).execute() }
+    }
+
+    @Test
+    fun `getMonthlyMenu returns Success with empty days list`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<MonthlyMenuQuery.Data>>()
+        val mockData = mockk<MonthlyMenuQuery.Data>()
+
+        coEvery { mockApolloClient.query(any<MonthlyMenuQuery>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.menu } returns MenuTestData.mockEmptyMenu
+
+        // When
+        val result = repository.getMonthlyMenu(MenuTestData.testYear, 3)
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals(MenuTestData.mockEmptyMenu, (result as Result.Success).data)
+        assertTrue(result.data.days.isEmpty())
+    }
+
+    @Test
+    fun `getMonthlyMenu returns Error when GraphQL has errors`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<MonthlyMenuQuery.Data>>()
+        val mockError = mockk<Error>()
+
+        coEvery { mockApolloClient.query(any<MonthlyMenuQuery>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns true
+        every { mockResponse.errors } returns listOf(mockError)
+        every { mockError.message } returns MenuTestData.graphqlErrorMessage
+
+        // When
+        val result = repository.getMonthlyMenu(MenuTestData.testYear, MenuTestData.testMonth)
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertEquals(MenuTestData.graphqlErrorMessage, (result as Result.Error).message)
+    }
+
+    @Test
+    fun `getMonthlyMenu returns Error with first error message when multiple errors exist`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<MonthlyMenuQuery.Data>>()
+        val mockError1 = mockk<Error>()
+        val mockError2 = mockk<Error>()
+
+        coEvery { mockApolloClient.query(any<MonthlyMenuQuery>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns true
+        every { mockResponse.errors } returns listOf(mockError1, mockError2)
+        every { mockError1.message } returns "First error"
+        every { mockError2.message } returns "Second error"
+
+        // When
+        val result = repository.getMonthlyMenu(MenuTestData.testYear, MenuTestData.testMonth)
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertEquals("First error", (result as Result.Error).message)
+    }
+
+    @Test
+    fun `getMonthlyMenu returns Error when data menu is null`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<MonthlyMenuQuery.Data>>()
+        val mockData = mockk<MonthlyMenuQuery.Data>()
+
+        coEvery { mockApolloClient.query(any<MonthlyMenuQuery>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.menu } returns null
+
+        // When
+        val result = repository.getMonthlyMenu(MenuTestData.testYear, MenuTestData.testMonth)
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertEquals("Sin datos de menú para la fecha especificada", (result as Result.Error).message)
+    }
+
+    @Test
+    fun `getMonthlyMenu returns Error on network exception`() = runTest {
+        // Given
+        val exception = mockk<ApolloException>()
+        every { exception.message } returns "Network timeout"
+        coEvery { mockApolloClient.query(any<MonthlyMenuQuery>()).execute() } throws exception
+
+        // When
+        val result = repository.getMonthlyMenu(MenuTestData.testYear, MenuTestData.testMonth)
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertTrue((result as Result.Error).message.startsWith("Error de conexión:"))
+        assertTrue(result.message.contains("Network timeout"))
+    }
+
+    // ========================================
+    // uploadMonthlyMenu() Tests
+    // ========================================
+
+    @Test
+    fun `uploadMonthlyMenu returns Success when status is ok`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<UploadMonthlyMenuMutation.Data>>()
+        val mockData = mockk<UploadMonthlyMenuMutation.Data>()
+
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.uploadMonthlyMenu } returns MenuTestData.mockUploadSuccessResponse
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            false
+        )
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals("Menú cargado exitosamente", (result as Result.Success).data)
+    }
+
+    @Test
+    fun `uploadMonthlyMenu returns Success with default message when message is empty`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<UploadMonthlyMenuMutation.Data>>()
+        val mockData = mockk<UploadMonthlyMenuMutation.Data>()
+
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.uploadMonthlyMenu } returns MenuTestData.mockUploadSuccessEmptyMessage
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            false
+        )
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals("Menú cargado", (result as Result.Success).data)
+    }
+
+    @Test
+    fun `uploadMonthlyMenu returns Error with conflict prefix when status is conflict and overwrite is false`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<UploadMonthlyMenuMutation.Data>>()
+        val mockData = mockk<UploadMonthlyMenuMutation.Data>()
+
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.uploadMonthlyMenu } returns MenuTestData.mockUploadConflictResponse
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            overwriteIfConflict = false
+        )
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertTrue((result as Result.Error).message.startsWith("conflict:"))
+        assertTrue(result.message.contains("Ya existe un menú para este mes"))
+    }
+
+    @Test
+    fun `uploadMonthlyMenu calls confirmOverwrite when status is conflict and overwrite is true`() = runTest {
+        // Given - Initial upload response with conflict
+        val mockUploadResponse = mockk<ApolloResponse<UploadMonthlyMenuMutation.Data>>()
+        val mockUploadData = mockk<UploadMonthlyMenuMutation.Data>()
+
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } returns mockUploadResponse
+        every { mockUploadResponse.hasErrors() } returns false
+        every { mockUploadResponse.data } returns mockUploadData
+        every { mockUploadData.uploadMonthlyMenu } returns MenuTestData.mockUploadConflictResponse
+
+        // Given - Confirm overwrite response with success
+        val mockConfirmResponse = mockk<ApolloResponse<ConfirmOverwriteMonthlyMenuMutation.Data>>()
+        val mockConfirmData = mockk<ConfirmOverwriteMonthlyMenuMutation.Data>()
+
+        coEvery { mockApolloClient.mutation(any<ConfirmOverwriteMonthlyMenuMutation>()).execute() } returns mockConfirmResponse
+        every { mockConfirmResponse.hasErrors() } returns false
+        every { mockConfirmResponse.data } returns mockConfirmData
+        every { mockConfirmData.confirmOverwriteMenu } returns MenuTestData.mockConfirmOverwriteSuccessResponse
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            overwriteIfConflict = true
+        )
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals("Menú reemplazado exitosamente", (result as Result.Success).data)
+        coVerify(exactly = 1) { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() }
+        coVerify(exactly = 1) { mockApolloClient.mutation(any<ConfirmOverwriteMonthlyMenuMutation>()).execute() }
+    }
+
+    @Test
+    fun `uploadMonthlyMenu returns Error when confirmOverwrite fails with GraphQL errors`() = runTest {
+        // Given - Initial upload response with conflict
+        val mockUploadResponse = mockk<ApolloResponse<UploadMonthlyMenuMutation.Data>>()
+        val mockUploadData = mockk<UploadMonthlyMenuMutation.Data>()
+
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } returns mockUploadResponse
+        every { mockUploadResponse.hasErrors() } returns false
+        every { mockUploadResponse.data } returns mockUploadData
+        every { mockUploadData.uploadMonthlyMenu } returns MenuTestData.mockUploadConflictResponse
+
+        // Given - Confirm overwrite response with errors
+        val mockConfirmResponse = mockk<ApolloResponse<ConfirmOverwriteMonthlyMenuMutation.Data>>()
+        val mockError = mockk<Error>()
+
+        coEvery { mockApolloClient.mutation(any<ConfirmOverwriteMonthlyMenuMutation>()).execute() } returns mockConfirmResponse
+        every { mockConfirmResponse.hasErrors() } returns true
+        every { mockConfirmResponse.errors } returns listOf(mockError)
+        every { mockError.message } returns "Error al confirmar sobrescritura"
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            overwriteIfConflict = true
+        )
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertEquals("Error al confirmar sobrescritura", (result as Result.Error).message)
+    }
+
+    @Test
+    fun `uploadMonthlyMenu returns Error when status is error`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<UploadMonthlyMenuMutation.Data>>()
+        val mockData = mockk<UploadMonthlyMenuMutation.Data>()
+
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.uploadMonthlyMenu } returns MenuTestData.mockUploadErrorResponse
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            false
+        )
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertEquals("Error al procesar el archivo", (result as Result.Error).message)
+    }
+
+    @Test
+    fun `uploadMonthlyMenu returns Error when status is unknown`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<UploadMonthlyMenuMutation.Data>>()
+        val mockData = mockk<UploadMonthlyMenuMutation.Data>()
+
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.uploadMonthlyMenu } returns MenuTestData.mockUploadUnknownStatusResponse
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            false
+        )
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertEquals("Estado desconocido", (result as Result.Error).message)
+    }
+
+    @Test
+    fun `uploadMonthlyMenu returns Error when GraphQL has errors on initial upload`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<UploadMonthlyMenuMutation.Data>>()
+        val mockError = mockk<Error>()
+
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns true
+        every { mockResponse.errors } returns listOf(mockError)
+        every { mockError.message } returns "Error subiendo menú"
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            false
+        )
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertEquals("Error subiendo menú", (result as Result.Error).message)
+    }
+
+    @Test
+    fun `uploadMonthlyMenu returns Error on network exception`() = runTest {
+        // Given
+        val exception = mockk<ApolloException>()
+        every { exception.message } returns "Connection failed"
+        coEvery { mockApolloClient.mutation(any<UploadMonthlyMenuMutation>()).execute() } throws exception
+
+        // When
+        val result = repository.uploadMonthlyMenu(
+            MenuTestData.testYear,
+            MenuTestData.testMonth,
+            MenuTestData.testFilename,
+            MenuTestData.mockFileBase64,
+            false
+        )
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertTrue((result as Result.Error).message.startsWith("Error de conexión:"))
+        assertTrue(result.message.contains("Connection failed"))
+    }
+
+    // ========================================
+    // proposeMenuChange() Tests
+    // ========================================
+
+    @Test
+    fun `proposeMenuChange returns Success with correct count when mutation succeeds`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<ProposeMenuChangeMutation.Data>>()
+        val mockData = mockk<ProposeMenuChangeMutation.Data>()
+        val items = listOf(MenuTestData.mockMenuChangeItem, MenuTestData.mockMenuChangeItem2)
+
+        coEvery { mockApolloClient.mutation(any<ProposeMenuChangeMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.proposeMenuChange } returns listOf(
+            MenuTestData.mockProposeChangeResponse,
+            MenuTestData.mockProposeChangeResponse2
+        )
+
+        // When
+        val result = repository.proposeMenuChange(items)
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals(2, (result as Result.Success).data)
+    }
+
+    @Test
+    fun `proposeMenuChange returns Success with count 3 for three changes`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<ProposeMenuChangeMutation.Data>>()
+        val mockData = mockk<ProposeMenuChangeMutation.Data>()
+        val items = listOf(
+            MenuTestData.mockMenuChangeItem,
+            MenuTestData.mockMenuChangeItem2,
+            MenuTestData.mockMenuChangeItemEmergency
+        )
+
+        coEvery { mockApolloClient.mutation(any<ProposeMenuChangeMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.proposeMenuChange } returns listOf(
+            MenuTestData.mockProposeChangeResponse,
+            MenuTestData.mockProposeChangeResponse2,
+            MenuTestData.mockProposeChangeResponse3
+        )
+
+        // When
+        val result = repository.proposeMenuChange(items)
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals(3, (result as Result.Success).data)
+    }
+
+    @Test
+    fun `proposeMenuChange returns Success with count 0 when no changes are made`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<ProposeMenuChangeMutation.Data>>()
+        val mockData = mockk<ProposeMenuChangeMutation.Data>()
+        val items = emptyList<MenuChangeItemInput>()
+
+        coEvery { mockApolloClient.mutation(any<ProposeMenuChangeMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.proposeMenuChange } returns emptyList()
+
+        // When
+        val result = repository.proposeMenuChange(items)
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals(0, (result as Result.Success).data)
+    }
+
+    @Test
+    fun `proposeMenuChange returns Success with count 0 when response is empty`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<ProposeMenuChangeMutation.Data>>()
+        val mockData = mockk<ProposeMenuChangeMutation.Data>()
+        val items = listOf(MenuTestData.mockMenuChangeItem)
+
+        coEvery { mockApolloClient.mutation(any<ProposeMenuChangeMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns false
+        every { mockResponse.data } returns mockData
+        every { mockData.proposeMenuChange } returns emptyList()
+
+        // When
+        val result = repository.proposeMenuChange(items)
+
+        // Then
+        assertTrue(result is Result.Success)
+        assertEquals(0, (result as Result.Success).data)
+    }
+
+    @Test
+    fun `proposeMenuChange returns Error when GraphQL has errors`() = runTest {
+        // Given
+        val mockResponse = mockk<ApolloResponse<ProposeMenuChangeMutation.Data>>()
+        val mockError = mockk<Error>()
+        val items = listOf(MenuTestData.mockMenuChangeItem)
+
+        coEvery { mockApolloClient.mutation(any<ProposeMenuChangeMutation>()).execute() } returns mockResponse
+        every { mockResponse.hasErrors() } returns true
+        every { mockResponse.errors } returns listOf(mockError)
+        every { mockError.message } returns "Error proponiendo cambios"
+
+        // When
+        val result = repository.proposeMenuChange(items)
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertEquals("Error proponiendo cambios", (result as Result.Error).message)
+    }
+
+    @Test
+    fun `proposeMenuChange returns Error on network exception`() = runTest {
+        // Given
+        val exception = mockk<ApolloException>()
+        every { exception.message } returns "Network error"
+        val items = listOf(MenuTestData.mockMenuChangeItem)
+        coEvery { mockApolloClient.mutation(any<ProposeMenuChangeMutation>()).execute() } throws exception
+
+        // When
+        val result = repository.proposeMenuChange(items)
+
+        // Then
+        assertTrue(result is Result.Error)
+        assertTrue((result as Result.Error).message.startsWith("Error de conexión:"))
+        assertTrue(result.message.contains("Network error"))
+    }
+}
