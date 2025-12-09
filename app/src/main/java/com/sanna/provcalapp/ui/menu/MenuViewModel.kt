@@ -28,27 +28,42 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
         _loading.value = true
         viewModelScope.launch {
             when (val r = repo.getMonthlyMenu(year, month)) {
-                is Result.Success -> { _menu.value = r.data; _message.value = null }
-                is Result.Error   -> _message.value = r.message
-                is Result.Loading -> {  }
+                is Result.Success -> {
+                    _menu.value = r.data
+                    _message.value = null
+                }
+                is Result.Error -> {
+                    _message.value = r.message
+                }
+                is Result.Loading -> { }
             }
             _loading.value = false
         }
     }
 
     fun uploadMenu(
-        year: Int, month: Int,
-        filename: String, base64: String,
+        year: Int,
+        month: Int,
+        filename: String,
+        base64: String,
         overwrite: Boolean,
-        onConflict: () -> Unit
+        onResult: (conflict: Boolean) -> Unit
     ) {
         _loading.value = true
         viewModelScope.launch {
             when (val r = repo.uploadMonthlyMenu(year, month, filename, base64, overwrite)) {
-                is Result.Success -> { _message.value = r.data; loadMenu(year, month) }
-                is Result.Error   -> {
-                    if (r.message.startsWith("conflict:")) onConflict()
-                    else _message.value = r.message
+                is Result.Success -> {
+                    _message.value = r.data
+                    loadMenu(year, month)
+                    onResult(false)
+                }
+                is Result.Error -> {
+                    if (r.message.startsWith("conflict:")) {
+                        onResult(true)
+                    } else {
+                        _message.value = r.message
+                        onResult(false)
+                    }
                 }
                 is Result.Loading -> { }
             }
@@ -60,9 +75,14 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
         _loading.value = true
         viewModelScope.launch {
             when (val r = repo.proposeMenuChange(items)) {
-                is Result.Success -> { _message.value = "Cambios propuestos: ${r.data}"; onDone(r.data) }
-                is Result.Error   -> _message.value = r.message
-                is Result.Loading -> {  }
+                is Result.Success -> {
+                    _message.value = "Cambios guardados exitosamente"
+                    onDone(r.data)
+                }
+                is Result.Error -> {
+                    _message.value = r.message
+                }
+                is Result.Loading -> { }
             }
             _loading.value = false
         }

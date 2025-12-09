@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+
+    <!-- Fondo con bordes redondeados -->
+    <path
+        android:fillColor="#107C41"
+        android:pathData="M8,4h36l12,12v36c0,4.4 -3.6,8 -8,8H8c-4.4,0 -8,-3.6 -8,-8V12c0,-4.4 3.6,-8 8,-8z" />
+
+    <!-- Rectángulo más claro al centro (simula hoja de Excel) -->
+    <path
+        android:fillColor="#1E8E4D"
+        android:pathData="M15,14h34v36H15z" />
+
+    <!-- Letra X blanca -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="0"
+        android:pathData="M23,22l6,8l-6,8h4l4,-5.6L35,38h4l-6,-8l6,-8h-4l-4,5.6L27,22z" />
+
+</vector>

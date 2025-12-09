@@ -9,50 +9,33 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Base64
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.GridLayout
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.material.button.MaterialButton
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sanna.provcalapp.MonthlyMenuQuery
 import com.sanna.provcalapp.R
-import com.sanna.provcalapp.databinding.FragmentMenuBinding
 import com.sanna.provcalapp.type.MenuChangeItemInput
 import java.io.InputStream
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.util.*
 
 class MenuFragment : Fragment() {
 
-    private var _binding: FragmentMenuBinding? = null
-    private val binding get() = _binding!!
-
     private val vm: MenuViewModel by viewModels()
-
     private val calendar = Calendar.getInstance()
-    private val dateFormat = SimpleDateFormat("MMMM yyyy", Locale("es", "ES"))
 
-    // Día (1..31) -> id de MenuDay para proponer cambios
-    private val menuDayIdByDay = mutableMapOf<Int, String>()
+    private var currentView: View? = null
+    private var isUploadView = true
 
-    // Modelo simple para pintar en el grid
-    data class MenuDay(
-        var desayuno: MutableList<String>,
-        var almuerzo: MutableList<String>,
-        var cena: MutableList<String>
-    )
-    private val menuData = mutableMapOf<Int, MenuDay>()
+    // Current selected day
+    private var selectedDay: MonthlyMenuQuery.Day? = null
+    private var currentMeal = "breakfast" // breakfast, lunch, dinner
 
     // File picker
     private val filePickerLauncher = registerForActivityResult(
@@ -67,272 +50,197 @@ class MenuFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentMenuBinding.inflate(inflater, container, false)
-        return binding.root
+    ): View? {
+        return inflater.inflate(R.layout.fragment_menu, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Observers básicos
+        // Observers
         vm.message.observe(viewLifecycleOwner) { msg ->
-            if (!msg.isNullOrBlank()) Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            if (!msg.isNullOrBlank()) {
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            }
         }
+
         vm.menu.observe(viewLifecycleOwner) { menu ->
-            if (menu != null) paintMenu(menu.days)
-        }
-
-        // Navegación de mes
-        binding.btnPrevMonth.setOnClickListener {
-            calendar.add(Calendar.MONTH, -1)
-            updateCalendar()
-            queryBackend()
-        }
-        binding.btnNextMonth.setOnClickListener {
-            calendar.add(Calendar.MONTH, 1)
-            updateCalendar()
-            queryBackend()
-        }
-
-        // Seleccionar archivo
-        binding.btnSelectFile.setOnClickListener { openFilePicker() }
-
-        // Inicio
-        updateCalendar()
-        queryBackend()
-    }
-
-    // ----- Backend → UI -----
-    private fun paintMenu(days: List<MonthlyMenuQuery.Day>) {
-        menuDayIdByDay.clear()
-        menuData.clear()
-
-        fun splitList(s: String?): MutableList<String> =
-        (s ?: "")
-            .trim()
-            .trim('"') // por si viene entre comillas del CSV
-            .split(Regex("\\s*[|,;]\\s*")) // separa por | o ,
-            .filter { it.isNotEmpty() }
-            .toMutableList()
-
-
-        for (d in days) {
-            val dayNum = try { d.date.substring(8, 10).toInt() } catch (_: Exception) { continue }
-            menuDayIdByDay[dayNum] = d.id
-            menuData[dayNum] = MenuDay(
-                desayuno = splitList(d.breakfast),
-                almuerzo = splitList(d.lunch),
-                cena = splitList(d.dinner)
-            )
-        }
-        updateCalendar() // repinta
-    }
-
-    // ----- UI de calendario -----
-    private fun updateCalendar() {
-        binding.tvCurrentMonth.text = dateFormat.format(calendar.time).replaceFirstChar { it.uppercase() }
-        binding.gridCalendar.removeAllViews()
-
-        val temp = calendar.clone() as Calendar
-        temp.set(Calendar.DAY_OF_MONTH, 1)
-
-        val firstDayOfWeek = temp.get(Calendar.DAY_OF_WEEK) - 1
-        val daysInMonth = temp.getActualMaximum(Calendar.DAY_OF_MONTH)
-
-        repeat(firstDayOfWeek) { addEmptyDayCell() }
-        for (day in 1..daysInMonth) addDayCell(day)
-    }
-
-    private fun addEmptyDayCell() {
-        val cell = View(requireContext()).apply {
-            layoutParams = GridLayout.LayoutParams().apply {
-                width = 0
-                height = ViewGroup.LayoutParams.WRAP_CONTENT
-                columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                setMargins(4, 4, 4, 4)
+            if (menu != null && !isUploadView) {
+                // Select first day by default
+                if (menu.days.isNotEmpty() && selectedDay == null) {
+                    selectedDay = menu.days.first()
+                    renderMenuDayCard()
+                }
             }
         }
-        binding.gridCalendar.addView(cell)
+
+        // Load initial view
+        showUploadView()
     }
 
-    private fun addDayCell(day: Int) {
-        val cellLayout = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            setPadding(6, 6, 6, 6)
-            setBackgroundResource(R.drawable.bg_calendar_cell)
-            layoutParams = GridLayout.LayoutParams().apply {
-                width = 0
-                height = ViewGroup.LayoutParams.WRAP_CONTENT
-                columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
-                setMargins(3, 3, 3, 3)
-            }
-            isClickable = true
-            isFocusable = true
-        }
+    // ===== UPLOAD VIEW =====
+    private fun showUploadView() {
+        isUploadView = true
+        val container = view?.findViewById<ViewGroup>(R.id.menuContainer) ?: return
+        container.removeAllViews()
 
-        val tvDay = TextView(requireContext()).apply {
-            text = day.toString()
-            textSize = 13f
-            setTextColor(ContextCompat.getColor(requireContext(), R.color.black))
-            gravity = Gravity.CENTER
-            setPadding(0, 0, 0, 4)
-        }
-        cellLayout.addView(tvDay)
+        currentView = layoutInflater.inflate(R.layout.layout_menu_upload, container, false)
+        container.addView(currentView)
 
-        // Pintar desayuno (ejemplo corto; repite si quieres para almuerzo/cena)
-        val data = menuData[day]
-        data?.desayuno?.forEach { item ->
-            val tvItem = TextView(requireContext()).apply {
-                text = item
-                textSize = 8f
-                setTextColor(Color.WHITE)
-                setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green_500))
-                setPadding(6, 3, 6, 3)
-                gravity = Gravity.CENTER
-                maxLines = 1
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { setMargins(0, 2, 0, 0) }
-            }
-            cellLayout.addView(tvItem)
-        }
-
-        cellLayout.setOnClickListener { showMenuDialog(day) }
-        binding.gridCalendar.addView(cellLayout)
+        setupUploadView(currentView!!)
     }
 
-    // ----- Diálogo día -----
-    private fun showMenuDialog(day: Int) {
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.dialog_menu_day)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.window?.setLayout(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+    private fun setupUploadView(view: View) {
+        // Year spinner
+        val acYear = view.findViewById<AutoCompleteTextView>(R.id.acYear)
+        val years = (2024..2030).map { it.toString() }
+        val yearAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, years)
+        acYear.setAdapter(yearAdapter)
+        acYear.setText(calendar.get(Calendar.YEAR).toString(), false)
+
+        // Month spinner
+        val acMonth = view.findViewById<AutoCompleteTextView>(R.id.acMonth)
+        val months = arrayOf(
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         )
+        val monthAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, months)
+        acMonth.setAdapter(monthAdapter)
+        acMonth.setText(months[calendar.get(Calendar.MONTH)], false)
 
-        val tvDayNumber = dialog.findViewById<TextView>(R.id.tvDayNumber)
-        val tvDayName = dialog.findViewById<TextView>(R.id.tvDayName)
-        val btnClose = dialog.findViewById<TextView>(R.id.btnClose)
+        // File selection
+        val cardFileArea = view.findViewById<View>(R.id.cardFileArea)
+        val btnSelectFile = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSelectFile)
 
-        val tmp = calendar.clone() as Calendar
-        tmp.set(Calendar.DAY_OF_MONTH, day)
-        val dayOfWeek = SimpleDateFormat("EEE", Locale("es", "ES")).format(tmp.time).uppercase()
+        cardFileArea.setOnClickListener { openFilePicker() }
+        btnSelectFile.setOnClickListener { openFilePicker() }
 
-        tvDayNumber.text = String.format("%02d", day)
-        tvDayName.text = dayOfWeek
+        // Back navigation
+        view.findViewById<ImageView>(R.id.btnBack)?.setOnClickListener {
+            findNavController().navigateUp()
+        }
 
-        setupMenuItems(dialog, day)
-        btnClose.setOnClickListener { dialog.dismiss() }
-        dialog.show()
-    }
-
-    private fun buildMealItemView(text: String): TextView {
-        return TextView(requireContext()).apply {
-            this.text = text
-            textSize = 12f
-            setTextColor(Color.parseColor("#666666"))
-            setBackgroundColor(Color.parseColor("#E8E8E8"))
-            setPadding(8, 8, 8, 8)
-            val lp = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            lp.setMargins(0, 0, 0, 6)
-            layoutParams = lp
+        // Close session
+        view.findViewById<LinearLayout>(R.id.btnCloseSession)?.setOnClickListener {
+            performLogout()
         }
     }
 
-    private fun renderMeal(layout: LinearLayout, items: List<String>) {
-        layout.removeAllViews()
-        val list = if (items.isEmpty()) listOf("—") else items
-        list.forEach { layout.addView(buildMealItemView(it)) }
+    // ===== LIST VIEW =====
+    private fun showListView() {
+        isUploadView = false
+        val container = view?.findViewById<ViewGroup>(R.id.menuContainer) ?: return
+        container.removeAllViews()
+
+        currentView = layoutInflater.inflate(R.layout.layout_menu_list, container, false)
+        container.addView(currentView)
+
+        setupListView(currentView!!)
+        loadMenuForCurrentMonth()
     }
 
-    private fun setupMenuItems(dialog: Dialog, day: Int) {
-        val layoutDesayuno = dialog.findViewById<LinearLayout>(R.id.layoutDesayuno)
-        val btnCambiarDesayuno = dialog.findViewById<MaterialButton>(R.id.btnCambiarDesayuno)
-        val layoutAlmuerzo = dialog.findViewById<LinearLayout>(R.id.layoutAlmuerzo)
-        val btnCambiarAlmuerzo = dialog.findViewById<MaterialButton>(R.id.btnCambiarAlmuerzo)
-        val layoutCena = dialog.findViewById<LinearLayout>(R.id.layoutCena)
-        val btnCambiarCena = dialog.findViewById<MaterialButton>(R.id.btnCambiarCena)
+    private fun setupListView(view: View) {
+        // Month display
+        val tvCurrentMonth = view.findViewById<TextView>(R.id.tvCurrentMonth)
+        updateMonthDisplay(tvCurrentMonth)
 
-        // RELLENAR CON LOS DATOS QUE YA LLEGARON DEL BACKEND
-        val dayData = menuData[day]
-        renderMeal(layoutDesayuno, dayData?.desayuno ?: emptyList())
-        renderMeal(layoutAlmuerzo, dayData?.almuerzo ?: emptyList())
-        renderMeal(layoutCena,     dayData?.cena     ?: emptyList())
+        // Month selector
+        view.findViewById<LinearLayout>(R.id.layoutMonthSelector)?.setOnClickListener {
+            showMonthPicker(tvCurrentMonth)
+        }
 
-        // Botones de edición / propuesta de cambio
-        btnCambiarDesayuno.setOnClickListener {
-            toggleEditMeal(layoutDesayuno, btnCambiarDesayuno) { nuevos ->
-                proposeFor(day, "breakfast", nuevos.joinToString(", "))
-            }
+        // Back to upload
+        view.findViewById<ImageView>(R.id.btnBack)?.setOnClickListener {
+            showUploadView()
         }
-        btnCambiarAlmuerzo.setOnClickListener {
-            toggleEditMeal(layoutAlmuerzo, btnCambiarAlmuerzo) { nuevos ->
-                proposeFor(day, "lunch", nuevos.joinToString(", "))
-            }
+
+        // Close session
+        view.findViewById<LinearLayout>(R.id.btnCloseSession)?.setOnClickListener {
+            performLogout()
         }
-        btnCambiarCena.setOnClickListener {
-            toggleEditMeal(layoutCena, btnCambiarCena) { nuevos ->
-                proposeFor(day, "dinner", nuevos.joinToString(", "))
-            }
-        }
+
+        // Setup day selection in calendar
+        setupCalendarDaySelection(view)
     }
 
-    /** Cambia TextViews <-> EditTexts. onSave recibe la lista final. */
-    private fun toggleEditMeal(
-        layout: LinearLayout,
-        button: MaterialButton,
-        onSave: (List<String>) -> Unit
-    ) {
-        if (button.text.toString().contains("Proponer", ignoreCase = true)) {
-            // a edición
-            for (i in 0 until layout.childCount) {
-                val v = layout.getChildAt(i)
-                if (v is TextView) {
-                    val et = EditText(requireContext()).apply {
-                        setText(v.text.toString())
-                        textSize = 12f
-                        setTextColor(Color.parseColor("#666666"))
-                        setBackgroundColor(Color.parseColor("#E8E8E8"))
-                        setPadding(8, 8, 8, 8)
-                    }
-                    layout.removeViewAt(i)
-                    layout.addView(et, i)
-                }
-            }
-            button.text = "Guardar"
-        } else {
-            // guardar
-            val newValues = mutableListOf<String>()
-            for (i in 0 until layout.childCount) {
-                val v = layout.getChildAt(i)
-                if (v is EditText) {
-                    val text = v.text.toString().trim()
-                    newValues.add(text)
-                    val tv = TextView(requireContext()).apply {
-                        this.text = text
-                        textSize = 12f
-                        setTextColor(Color.parseColor("#666666"))
-                        setBackgroundColor(Color.parseColor("#E8E8E8"))
-                        setPadding(8, 8, 8, 8)
-                    }
-                    layout.removeViewAt(i)
-                    layout.addView(tv, i)
-                }
-            }
-            onSave(newValues)
-            button.text = "Proponer cambio"
-        }
+    private fun setupCalendarDaySelection(view: View) {
+        // En una implementación real, deberías generar dinámicamente
+        // los días del mes y hacer cada uno clickeable.
+        // Por ahora, haremos que al cargar el menú se muestre el primer día
     }
 
-    // ----- File picker -----
-    // ----- File picker -----
+    private fun renderMenuDayCard() {
+        val day = selectedDay ?: return
+        val container = currentView?.findViewById<LinearLayout>(R.id.containerMenuDay) ?: return
+
+        container.removeAllViews()
+
+        // Inflate card
+        val cardView = layoutInflater.inflate(R.layout.layout_menu_day_card, container, false)
+
+        // Parse meals
+        val breakfast = day.breakfast?.split("|")?.map { it.trim() } ?: emptyList()
+        val lunch = day.lunch?.split("|")?.map { it.trim() } ?: emptyList()
+        val dinner = day.dinner?.split("|")?.map { it.trim() } ?: emptyList()
+
+        // Populate data based on selected meal
+        when (currentMeal) {
+            "breakfast" -> {
+                cardView.findViewById<TextView>(R.id.tvBebida)?.text =
+                    breakfast.getOrNull(0) ?: "—"
+                cardView.findViewById<TextView>(R.id.tvBebidaCalorias)?.text =
+                    breakfast.getOrNull(1) ?: "—"
+            }
+            "lunch" -> {
+                cardView.findViewById<TextView>(R.id.tvPlato)?.text =
+                    lunch.getOrNull(0) ?: "—"
+                cardView.findViewById<TextView>(R.id.tvPlatoCalorias)?.text =
+                    lunch.getOrNull(1) ?: "—"
+            }
+            "dinner" -> {
+                cardView.findViewById<TextView>(R.id.tvSandwich)?.text =
+                    dinner.getOrNull(0) ?: "—"
+                cardView.findViewById<TextView>(R.id.tvSandwichCalorias)?.text =
+                    dinner.getOrNull(1) ?: "—"
+            }
+        }
+
+        // Setup meal selector buttons
+        val btnDesayuno = cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDesayuno)
+        val btnAlmuerzo = cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnAlmuerzo)
+        val btnCena = cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCena)
+
+        btnDesayuno?.setOnClickListener {
+            currentMeal = "breakfast"
+            renderMenuDayCard()
+        }
+
+        btnAlmuerzo?.setOnClickListener {
+            currentMeal = "lunch"
+            renderMenuDayCard()
+        }
+
+        btnCena?.setOnClickListener {
+            currentMeal = "dinner"
+            renderMenuDayCard()
+        }
+
+        // Edit button
+        cardView.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabEdit)
+            ?.setOnClickListener {
+                showEditDialog(day)
+            }
+
+        container.addView(cardView)
+    }
+
+    private fun updateMonthDisplay(textView: TextView) {
+        textView.text = SimpleDateFormat("MMM yyyy", Locale("es", "ES"))
+            .format(calendar.time)
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+    }
+
+    // ===== FILE HANDLING =====
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -340,44 +248,39 @@ class MenuFragment : Fragment() {
             putExtra(
                 Intent.EXTRA_MIME_TYPES,
                 arrayOf(
-                    // Excel
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                     "application/vnd.ms-excel",
-                    // CSV (variantes reales que reportan muchos proveedores)
                     "text/csv",
-                    "text/comma-separated-values",
-                    "text/x-comma-separated-values",
-                    "text/plain",
-                    "application/csv",
-                    "application/x-csv",
-                    "application/octet-stream"
+                    "text/plain"
                 )
             )
         }
         filePickerLauncher.launch(intent)
     }
 
-
     private fun handleSelectedFile(uri: Uri) {
-        val y = calendar.get(Calendar.YEAR)
-        val m = calendar.get(Calendar.MONTH) + 1
+        val yearText =
+            currentView?.findViewById<AutoCompleteTextView>(R.id.acYear)?.text?.toString()
+        val monthText =
+            currentView?.findViewById<AutoCompleteTextView>(R.id.acMonth)?.text?.toString()
+
+        val y = yearText?.toIntOrNull() ?: return
+        val months = arrayOf(
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        )
+        val m = months.indexOf(monthText) + 1
+        if (m <= 0) return
+
         val fileName = getFileName(uri) ?: "menu_${y}_${m}.xlsx"
         val base64 = readAsBase64(uri) ?: run {
-            Toast.makeText(requireContext(), "No se pudo leer el archivo", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "No se pudo leer el archivo", Toast.LENGTH_SHORT)
+                .show()
             return
         }
-        binding.tvFileName.text = fileName
 
-        vm.uploadMenu(y, m, fileName, base64, overwrite = false) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Sobrescribir menú")
-                .setMessage("Ya existe un menú para este mes. ¿Deseas reemplazarlo?")
-                .setPositiveButton("Sí, reemplazar") { _, _ ->
-                    vm.uploadMenu(y, m, fileName, base64, overwrite = true) { }
-                }
-                .setNegativeButton("Cancelar", null)
-                .show()
-        }
+        // Ahora, en vez de subir directo, mostramos el popup
+        showImportDialog(y, m, fileName, base64)
     }
 
     private fun getFileName(uri: Uri): String? {
@@ -398,37 +301,208 @@ class MenuFragment : Fragment() {
         }
     }
 
-    // ----- Proponer cambio -----
-    private fun proposeFor(day: Int, mealType: String, newValueJoined: String) {
-        val y = calendar.get(Calendar.YEAR)
-        val m = calendar.get(Calendar.MONTH) + 1
-        val menuDayId = menuDayIdByDay[day] ?: run {
-            Toast.makeText(requireContext(), "No hay menú para este día", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val dateIso = String.format(Locale.US, "%04d-%02d-%02d", y, m, day)
-
-        val item = MenuChangeItemInput(
-            menuDayId = menuDayId,
-            day = dateIso, // mapeado a scalar Date (string)
-            mealType = mealType,
-            newValue = newValueJoined,
-            reason = "Actualizado por Nutricionista desde app",
-            emergency = false
+    // ===== POPUP IMPORT EXCEL =====
+    private fun showImportDialog(
+        year: Int,
+        month: Int,
+        fileName: String,
+        base64: String
+    ) {
+        val dialog = Dialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.popup_import_excel, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        vm.proposeChanges(listOf(item)) {
-            vm.loadMenu(y, m) // refresca
+
+        val tvDialogFileName =
+            dialogView.findViewById<TextView>(R.id.tvDialogFileName)
+        val btnImport =
+            dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDialogImport)
+        val btnCancel =
+            dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDialogCancel)
+
+        tvDialogFileName.text = fileName
+
+        btnImport.setOnClickListener {
+            // Mismo flujo de upload que tenías antes
+            vm.uploadMenu(year, month, fileName, base64, overwrite = false) { conflict ->
+                dialog.dismiss()
+
+                if (conflict) {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Sobrescribir menú")
+                        .setMessage("Ya existe un menú para este mes. ¿Deseas reemplazarlo?")
+                        .setPositiveButton("Sí, reemplazar") { _, _ ->
+                            vm.uploadMenu(
+                                year,
+                                month,
+                                fileName,
+                                base64,
+                                overwrite = true
+                            ) { _ ->
+                                calendar.set(Calendar.YEAR, year)
+                                calendar.set(Calendar.MONTH, month - 1)
+                                showListView()
+                            }
+                        }
+                        .setNegativeButton("Cancelar", null)
+                        .show()
+                } else {
+                    // Success
+                    calendar.set(Calendar.YEAR, year)
+                    calendar.set(Calendar.MONTH, month - 1)
+                    showListView()
+                }
+            }
         }
+
+        btnCancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
-    private fun queryBackend() {
+    // ===== MONTH PICKER =====
+    private fun showMonthPicker(textView: TextView) {
+        val months = arrayOf(
+            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+        )
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Seleccionar mes")
+            .setItems(months) { _, which ->
+                calendar.set(Calendar.MONTH, which)
+                updateMonthDisplay(textView)
+                loadMenuForCurrentMonth()
+            }
+            .show()
+    }
+
+    // ===== DATA LOADING =====
+    private fun loadMenuForCurrentMonth() {
         val y = calendar.get(Calendar.YEAR)
         val m = calendar.get(Calendar.MONTH) + 1
         vm.loadMenu(y, m)
     }
 
+    // ===== EDIT DIALOG =====
+    private fun showEditDialog(day: MonthlyMenuQuery.Day) {
+        val dialog = Dialog(requireContext())
+        val dialogView = layoutInflater.inflate(R.layout.popup_edit_menu, null)
+        dialog.setContentView(dialogView)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+
+        // Setup dropdowns
+        val acBebida = dialogView.findViewById<AutoCompleteTextView>(R.id.acBebida)
+        val acPlato = dialogView.findViewById<AutoCompleteTextView>(R.id.acPlato)
+        val acGuarnicion1 = dialogView.findViewById<AutoCompleteTextView>(R.id.acGuarnicion1)
+        val acGuarnicion2 = dialogView.findViewById<AutoCompleteTextView>(R.id.acGuarnicion2)
+        val acPanCon = dialogView.findViewById<AutoCompleteTextView>(R.id.acPanCon)
+        val tvQuantity = dialogView.findViewById<TextView>(R.id.tvQuantity)
+
+        // Parse existing data
+        val breakfast = day.breakfast?.split("|")?.map { it.trim() } ?: emptyList()
+        val lunch = day.lunch?.split("|")?.map { it.trim() } ?: emptyList()
+        val dinner = day.dinner?.split("|")?.map { it.trim() } ?: emptyList()
+
+        // Populate fields
+        if (breakfast.isNotEmpty()) acBebida.setText(breakfast.first())
+        if (lunch.isNotEmpty()) acPlato.setText(lunch.first())
+        if (lunch.size > 1) acGuarnicion2.setText(lunch.last())
+
+        // Parse dinner for quantity
+        var quantity = 2
+        if (dinner.isNotEmpty()) {
+            val dinnerText = dinner.first()
+            val parts = dinnerText.split(" ")
+            quantity = parts.firstOrNull()?.toIntOrNull() ?: 2
+            acPanCon.setText(parts.drop(3).joinToString(" "))
+        }
+        tvQuantity.text = quantity.toString()
+
+        // Quantity controls
+        dialogView.findViewById<ImageView>(R.id.btnDecrease).setOnClickListener {
+            if (quantity > 1) {
+                quantity--
+                tvQuantity.text = quantity.toString()
+            }
+        }
+
+        dialogView.findViewById<ImageView>(R.id.btnIncrease).setOnClickListener {
+            quantity++
+            tvQuantity.text = quantity.toString()
+        }
+
+        // Close button
+        dialogView.findViewById<ImageView>(R.id.btnClose).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        // Confirm button
+        dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnConfirm)
+            .setOnClickListener {
+                val newBreakfast = acBebida.text.toString()
+                val newLunch = "${acPlato.text} | ${acGuarnicion2.text}"
+                val newDinner = "$quantity panes con ${acPanCon.text}"
+
+                val y = calendar.get(Calendar.YEAR)
+                val m = calendar.get(Calendar.MONTH) + 1
+                val dayNum = day.date.substring(8, 10).toInt()
+                val dateIso = String.format(Locale.US, "%04d-%02d-%02d", y, m, dayNum)
+
+                val items = listOf(
+                    MenuChangeItemInput(
+                        menuDayId = day.id,
+                        day = dateIso,
+                        mealType = "breakfast",
+                        newValue = newBreakfast,
+                        reason = "Actualizado por Nutricionista",
+                        emergency = false
+                    ),
+                    MenuChangeItemInput(
+                        menuDayId = day.id,
+                        day = dateIso,
+                        mealType = "lunch",
+                        newValue = newLunch,
+                        reason = "Actualizado por Nutricionista",
+                        emergency = false
+                    ),
+                    MenuChangeItemInput(
+                        menuDayId = day.id,
+                        day = dateIso,
+                        mealType = "dinner",
+                        newValue = newDinner,
+                        reason = "Actualizado por Nutricionista",
+                        emergency = false
+                    )
+                )
+
+                vm.proposeChanges(items) {
+                    loadMenuForCurrentMonth()
+                    dialog.dismiss()
+                }
+            }
+
+        dialog.show()
+    }
+
+    private fun performLogout() {
+        // TODO: Implementar logout real
+        Toast.makeText(requireContext(), "Cerrar sesión", Toast.LENGTH_SHORT).show()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        currentView = null
+        selectedDay = null
     }
 }
