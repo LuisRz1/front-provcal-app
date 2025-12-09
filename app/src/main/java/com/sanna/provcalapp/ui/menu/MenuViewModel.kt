@@ -30,7 +30,7 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
             when (val r = repo.getMonthlyMenu(year, month)) {
                 is Result.Success -> { _menu.value = r.data; _message.value = null }
                 is Result.Error   -> _message.value = r.message
-                is Result.Loading -> { /* no-op, ya marcamos _loading arriba */ }
+                is Result.Loading -> {  }
             }
             _loading.value = false
         }
@@ -50,7 +50,7 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
                     if (r.message.startsWith("conflict:")) onConflict()
                     else _message.value = r.message
                 }
-                is Result.Loading -> { /* no-op */ }
+                is Result.Loading -> { }
             }
             _loading.value = false
         }
@@ -62,7 +62,7 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
             when (val r = repo.proposeMenuChange(items)) {
                 is Result.Success -> { _message.value = "Cambios propuestos: ${r.data}"; onDone(r.data) }
                 is Result.Error   -> _message.value = r.message
-                is Result.Loading -> { /* no-op */ }
+                is Result.Loading -> {  }
             }
             _loading.value = false
         }

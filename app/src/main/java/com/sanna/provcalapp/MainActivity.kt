@@ -23,9 +23,7 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(
             setOf(R.id.navigation_home, R.id.navigation_dashboard, R.id.navigation_notifications)
         )
-        // Nota: si usas Toolbar luego, aplica setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        // (opcional futuro rol->tab) si me autorizas tocar MainActivity, aquí leeríamos "target_tab".
     }
 }

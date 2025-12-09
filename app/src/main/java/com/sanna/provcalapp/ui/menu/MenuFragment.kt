@@ -260,7 +260,7 @@ class MenuFragment : Fragment() {
         val layoutCena = dialog.findViewById<LinearLayout>(R.id.layoutCena)
         val btnCambiarCena = dialog.findViewById<MaterialButton>(R.id.btnCambiarCena)
 
-        // 👉 RELLENAR CON LOS DATOS QUE YA LLEGARON DEL BACKEND
+        // RELLENAR CON LOS DATOS QUE YA LLEGARON DEL BACKEND
         val dayData = menuData[day]
         renderMeal(layoutDesayuno, dayData?.desayuno ?: emptyList())
         renderMeal(layoutAlmuerzo, dayData?.almuerzo ?: emptyList())
