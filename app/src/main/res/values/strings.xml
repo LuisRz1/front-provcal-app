@@ -55,4 +55,21 @@
     <string name="welcome_subtitle">Marca tu asistencia, no olvides revisar tu horario</string>
     <string name="welcome_cta">Continuar</string>
 
+    <!-- Menu Module -->
+    <string name="cargar_menu">Carga del menú para el mes:</string>
+    <string name="seleccionar_archivo">Seleccionar Archivo para subir</string>
+    <string name="formato_aceptado">Formato aceptado: Excel</string>
+    <string name="maximo_tamano">Máximo: 20 mb</string>
+    <string name="verificar_archivo">Verifique que el archivo cubra los menús para las 4 semanas del mes escogido.</string>
+    <string name="editar_menu">EDITAR MENÚ</string>
+    <string name="bebida">Bebida</string>
+    <string name="plato">Plato</string>
+    <string name="guarnicion_1">Guarnicion 1</string>
+    <string name="guarnicion_2">Guarnicion 2</string>
+    <string name="pan_con">Pan con:</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="desayuno">Desayuno</string>
+    <string name="plato_caliente">Plato Caliente</string>
+    <string name="sandwich">Sandwich</string>
+    <string name="total_calorias">Total: %d Kcal</string>
 </resources>

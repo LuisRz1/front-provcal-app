@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Base64
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.sanna.provcalapp.MonthlyMenuQuery
 import com.sanna.provcalapp.R
@@ -33,7 +35,7 @@ class MenuFragment : Fragment() {
     private var currentView: View? = null
     private var isUploadView = true
 
-    // Current selected day
+    // Día seleccionado actualmente
     private var selectedDay: MonthlyMenuQuery.Day? = null
     private var currentMeal = "breakfast" // breakfast, lunch, dinner
 
@@ -66,15 +68,15 @@ class MenuFragment : Fragment() {
 
         vm.menu.observe(viewLifecycleOwner) { menu ->
             if (menu != null && !isUploadView) {
-                // Select first day by default
                 if (menu.days.isNotEmpty() && selectedDay == null) {
                     selectedDay = menu.days.first()
-                    renderMenuDayCard()
                 }
+                currentView?.let { setupCalendarDaySelection(it, menu) }
+                renderMenuDayCard()
             }
         }
 
-        // Load initial view
+        // Vista inicial: carga de menú (subir Excel)
         showUploadView()
     }
 
@@ -110,7 +112,8 @@ class MenuFragment : Fragment() {
 
         // File selection
         val cardFileArea = view.findViewById<View>(R.id.cardFileArea)
-        val btnSelectFile = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSelectFile)
+        val btnSelectFile =
+            view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSelectFile)
 
         cardFileArea.setOnClickListener { openFilePicker() }
         btnSelectFile.setOnClickListener { openFilePicker() }
@@ -158,16 +161,91 @@ class MenuFragment : Fragment() {
         view.findViewById<LinearLayout>(R.id.btnCloseSession)?.setOnClickListener {
             performLogout()
         }
-
-        // Setup day selection in calendar
-        setupCalendarDaySelection(view)
+        // El calendario se arma cuando llega el menú (en vm.menu.observe)
     }
 
-    private fun setupCalendarDaySelection(view: View) {
-        // En una implementación real, deberías generar dinámicamente
-        // los días del mes y hacer cada uno clickeable.
-        // Por ahora, haremos que al cargar el menú se muestre el primer día
+    // ===== CALENDARIO (DÍAS DEL MES) =====
+    private fun setupCalendarDaySelection(view: View, menu: MonthlyMenuQuery.Menu) {
+        val row = view.findViewById<LinearLayout>(R.id.layoutDaysRow) ?: return
+        row.removeAllViews()
+
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1
+
+        // Obtener cantidad de días del mes actual
+        val tmpCal = Calendar.getInstance().apply {
+            set(Calendar.YEAR, year)
+            set(Calendar.MONTH, month - 1)
+        }
+        val daysInMonth = tmpCal.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+        for (dayNum in 1..daysInMonth) {
+            val dateIso = String.format(Locale.US, "%04d-%02d-%02d", year, month, dayNum)
+
+            // Buscar si hay menú para esa fecha
+            val dayData = menu.days.firstOrNull { it.date.startsWith(dateIso) }
+
+            val isSelected = selectedDay?.date?.startsWith(dateIso) == true
+            val hasMenu = dayData != null
+
+            val card = MaterialCardView(requireContext()).apply {
+                val lp = LinearLayout.LayoutParams(
+                    dpToPx(40),
+                    dpToPx(40)
+                )
+                lp.marginEnd = dpToPx(8)
+                layoutParams = lp
+
+                radius = dpToPx(20).toFloat()
+                cardElevation = 0f
+                setCardBackgroundColor(
+                    when {
+                        isSelected -> Color.parseColor("#18A558") // verde seleccionado
+                        else -> Color.TRANSPARENT
+                    }
+                )
+
+                val tv = TextView(requireContext()).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                    text = dayNum.toString()
+                    gravity = Gravity.CENTER
+                    textSize = 14f
+                    setTextColor(
+                        when {
+                            isSelected -> Color.WHITE
+                            hasMenu -> Color.parseColor("#202124")
+                            else -> Color.parseColor("#BDBDBD")
+                        }
+                    )
+                }
+                addView(tv)
+
+                setOnClickListener {
+                    if (!hasMenu) {
+                        Toast.makeText(
+                            requireContext(),
+                            "No hay menú registrado para este día",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@setOnClickListener
+                    }
+
+                    selectedDay = dayData
+                    currentMeal = "breakfast"
+                    currentView?.let { v -> setupCalendarDaySelection(v, menu) }
+                    renderMenuDayCard()
+                }
+            }
+
+            row.addView(card)
+        }
     }
+
+    private fun dpToPx(dp: Int): Int =
+        (dp * resources.displayMetrics.density).toInt()
 
     private fun renderMenuDayCard() {
         val day = selectedDay ?: return
@@ -175,7 +253,6 @@ class MenuFragment : Fragment() {
 
         container.removeAllViews()
 
-        // Inflate card
         val cardView = layoutInflater.inflate(R.layout.layout_menu_day_card, container, false)
 
         // Parse meals
@@ -183,7 +260,6 @@ class MenuFragment : Fragment() {
         val lunch = day.lunch?.split("|")?.map { it.trim() } ?: emptyList()
         val dinner = day.dinner?.split("|")?.map { it.trim() } ?: emptyList()
 
-        // Populate data based on selected meal
         when (currentMeal) {
             "breakfast" -> {
                 cardView.findViewById<TextView>(R.id.tvBebida)?.text =
@@ -205,10 +281,13 @@ class MenuFragment : Fragment() {
             }
         }
 
-        // Setup meal selector buttons
-        val btnDesayuno = cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDesayuno)
-        val btnAlmuerzo = cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnAlmuerzo)
-        val btnCena = cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCena)
+        // Botones de tipo de comida
+        val btnDesayuno =
+            cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDesayuno)
+        val btnAlmuerzo =
+            cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnAlmuerzo)
+        val btnCena =
+            cardView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnCena)
 
         btnDesayuno?.setOnClickListener {
             currentMeal = "breakfast"
@@ -279,7 +358,7 @@ class MenuFragment : Fragment() {
             return
         }
 
-        // Ahora, en vez de subir directo, mostramos el popup
+        // Popup de confirmación de importación
         showImportDialog(y, m, fileName, base64)
     }
 
@@ -327,7 +406,6 @@ class MenuFragment : Fragment() {
         tvDialogFileName.text = fileName
 
         btnImport.setOnClickListener {
-            // Mismo flujo de upload que tenías antes
             vm.uploadMenu(year, month, fileName, base64, overwrite = false) { conflict ->
                 dialog.dismiss()
 
@@ -351,7 +429,6 @@ class MenuFragment : Fragment() {
                         .setNegativeButton("Cancelar", null)
                         .show()
                 } else {
-                    // Success
                     calendar.set(Calendar.YEAR, year)
                     calendar.set(Calendar.MONTH, month - 1)
                     showListView()
@@ -401,7 +478,6 @@ class MenuFragment : Fragment() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
 
-        // Setup dropdowns
         val acBebida = dialogView.findViewById<AutoCompleteTextView>(R.id.acBebida)
         val acPlato = dialogView.findViewById<AutoCompleteTextView>(R.id.acPlato)
         val acGuarnicion1 = dialogView.findViewById<AutoCompleteTextView>(R.id.acGuarnicion1)
@@ -409,17 +485,14 @@ class MenuFragment : Fragment() {
         val acPanCon = dialogView.findViewById<AutoCompleteTextView>(R.id.acPanCon)
         val tvQuantity = dialogView.findViewById<TextView>(R.id.tvQuantity)
 
-        // Parse existing data
         val breakfast = day.breakfast?.split("|")?.map { it.trim() } ?: emptyList()
         val lunch = day.lunch?.split("|")?.map { it.trim() } ?: emptyList()
         val dinner = day.dinner?.split("|")?.map { it.trim() } ?: emptyList()
 
-        // Populate fields
         if (breakfast.isNotEmpty()) acBebida.setText(breakfast.first())
         if (lunch.isNotEmpty()) acPlato.setText(lunch.first())
         if (lunch.size > 1) acGuarnicion2.setText(lunch.last())
 
-        // Parse dinner for quantity
         var quantity = 2
         if (dinner.isNotEmpty()) {
             val dinnerText = dinner.first()
@@ -429,7 +502,6 @@ class MenuFragment : Fragment() {
         }
         tvQuantity.text = quantity.toString()
 
-        // Quantity controls
         dialogView.findViewById<ImageView>(R.id.btnDecrease).setOnClickListener {
             if (quantity > 1) {
                 quantity--
@@ -442,12 +514,10 @@ class MenuFragment : Fragment() {
             tvQuantity.text = quantity.toString()
         }
 
-        // Close button
         dialogView.findViewById<ImageView>(R.id.btnClose).setOnClickListener {
             dialog.dismiss()
         }
 
-        // Confirm button
         dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnConfirm)
             .setOnClickListener {
                 val newBreakfast = acBebida.text.toString()
