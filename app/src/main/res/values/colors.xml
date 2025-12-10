@@ -20,4 +20,8 @@
     <color name="gray_cancel">#9E9E9E</color>
     <color name="gray_text">#757575</color>
     <color name="light_gray_background">#F5F5F5</color>
+
+    <!-- Snackbar Colors -->
+    <color name="error_red">#E53935</color>
+    <color name="success_green">#19AC54</color>
 </resources>

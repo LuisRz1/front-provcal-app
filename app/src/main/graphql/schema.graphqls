@@ -194,88 +194,83 @@ extend type Mutation {
 # ============================================
 # SANITARY CONTROL (HEALTH POLICY)
 # ============================================
-# Uncomment when backend is ready
 
-# type HealthPolicy {
-#   id: ID!
-#   name: String!
-#   description: String
-#   type: PolicyTypeEnum!
-#   isActive: Boolean!
-# }
-#
-# enum PolicyTypeEnum {
-#   PEST_CONTROL
-#   WASTE_MANAGEMENT
-#   DINING_SANITATION
-# }
-#
-# type HealthRevision {
-#   id: ID!
-#   policyId: ID!
-#   userId: ID!
-#   date: Date!
-#   isConforme: Boolean!
-#   observation: String
-#   incidentTypeId: ID
-#   companyId: ID
-#   createdAt: Date!
-# }
-#
-# type RevisionHistoryItem {
-#   id: ID!
-#   date: String!
-#   monthLabel: String!
-#   isConforme: Boolean!
-#   observation: String
-#   incidentType: String
-#   company: Company
-#   hasIncident: Boolean!
-# }
-#
-# type IncidentType {
-#   id: ID!
-#   policyId: ID!
-#   name: String!
-#   description: String
-# }
-#
-# type Company {
-#   id: ID!
-#   socialReason: String!
-#   ruc: String!
-#   phone: String
-#   email: String
-#   serviceType: String!
-# }
-#
-# input SubmitRevisionInput {
-#   policyId: ID!
-#   date: Date!
-#   isConforme: Boolean!
-#   observation: String
-#   incidentTypeId: ID
-#   companyId: ID
-# }
-#
-# type SubmitRevisionResponse {
-#   success: Boolean!
-#   message: String!
-#   revisionId: ID
-#   nextRevisionDate: String
-# }
-#
-# extend type Query {
-#   healthPolicies: [HealthPolicy!]!
-#   revisionHistory(policyId: ID!, filterMonths: Int): [RevisionHistoryItem!]!
-#   nextRevisionDate(policyId: ID!): String
-#   revisionById(revisionId: ID!): HealthRevision
-#   companies(serviceType: String): [Company!]!
-#   companyById(companyId: ID!): Company
-#   incidentTypes(policyId: ID!): [IncidentType!]!
-# }
-#
-# extend type Mutation {
-#   scheduleRevision(policyId: ID!, date: Date!): Boolean!
-#   submitRevision(input: SubmitRevisionInput!): SubmitRevisionResponse!
-# }
+type SanitaryPolicyType {
+  id: ID!
+  name: String!
+  description: String
+  isActive: Boolean!
+}
+
+type SanitaryReviewType {
+  id: ID!
+  policyId: ID!
+  userId: ID!
+  date: Date!
+  isConform: Boolean!
+  observation: String
+  incidentTypeId: ID
+  companyId: ID
+}
+
+type IncidentTypeType {
+  id: ID!
+  policyId: ID!
+  name: String!
+  description: String
+  isActive: Boolean!
+}
+
+type SanitaryCompanyType {
+  id: ID!
+  businessName: String!
+  ruc: String!
+  phone: String
+  email: String
+}
+
+type SanitaryPoliciesResponse {
+  success: Boolean!
+  message: String!
+  policies: [SanitaryPolicyType!]!
+}
+
+type SanitaryPolicyHistoryResponse {
+  success: Boolean!
+  message: String!
+  policy: SanitaryPolicyType
+  history: [SanitaryReviewType!]!
+  lastReviewDate: Date
+  nextReviewDate: Date
+}
+
+type RegisterSanitaryReviewResponse {
+  success: Boolean!
+  message: String!
+  review: SanitaryReviewType
+}
+
+input SanitaryPolicyHistoryFilterInput {
+  policyId: ID!
+  monthsBack: Int!
+}
+
+input RegisterSanitaryReviewInput {
+  policyId: ID!
+  date: Date!
+  isConform: Boolean!
+  observation: String
+  incidentTypeId: ID
+  companyId: ID
+}
+
+extend type Query {
+  sanitaryPolicies: SanitaryPoliciesResponse!
+  sanitaryPolicyHistory(filter: SanitaryPolicyHistoryFilterInput!): SanitaryPolicyHistoryResponse!
+  sanitaryIncidentTypesByPolicy(policyId: ID!): [IncidentTypeType!]!
+  sanitaryCompanies: [SanitaryCompanyType!]!
+}
+
+extend type Mutation {
+  registerSanitaryReview(input: RegisterSanitaryReviewInput!): RegisterSanitaryReviewResponse!
+}

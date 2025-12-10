@@ -91,6 +91,18 @@ class IncidentReportViewModel(application: Application) : AndroidViewModel(appli
             val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
             val currentDate = dateFormat.format(Date())
 
+            // Debug logging
+            android.util.Log.d("IncidentReportVM", "=== SUBMITTING REVISION ===")
+            android.util.Log.d("IncidentReportVM", "Policy ID: $policyId")
+            android.util.Log.d("IncidentReportVM", "Incident Type ID: $incidentTypeId")
+            android.util.Log.d("IncidentReportVM", "Company ID: $companyId")
+            android.util.Log.d("IncidentReportVM", "Is Conforme: $isConforme")
+
+            // Log loaded incident types for comparison
+            _incidentTypes.value?.forEach { type ->
+                android.util.Log.d("IncidentReportVM", "Available incident type: ${type.id} -> ${type.name} (policy: ${type.policyId})")
+            }
+
             val input = SubmitRevisionInput(
                 policyId = policyId,
                 date = currentDate,
@@ -105,6 +117,7 @@ class IncidentReportViewModel(application: Application) : AndroidViewModel(appli
                     _saveSuccess.value = true
                 }
                 is Result.Error -> {
+                    android.util.Log.e("IncidentReportVM", "Submission error: ${result.message}")
                     _errorMessage.value = result.message
                 }
                 is Result.Loading -> {
