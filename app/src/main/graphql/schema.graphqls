@@ -132,13 +132,30 @@ type EndBreakResponse {
 scalar Date
 
 type MenuDayInfo {
-  id: ID!
-  date: Date!
-  breakfast: String!
-  lunch: String!
-  dinner: String!
-  isHoliday: Boolean!
+    id: ID!
+    date: Date!
+    breakfast: String!
+    lunch: String!
+    dinner: String!
+    isHoliday: Boolean!
+
+    # NUEVO: detalle completo del día (desayuno, almuerzo, cena)
+    meals: [MenuMealInfo!]!
 }
+
+type MenuMealComponentInfo {
+    componentType: String!
+    dishName: String!
+    calories: Int
+    order: Int!
+}
+
+type MenuMealInfo {
+    mealType: String!
+    totalKcal: Int
+    components: [MenuMealComponentInfo!]!
+}
+
 
 type MonthlyMenuCalendar {
   year: Int!

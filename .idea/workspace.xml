@@ -126,16 +126,8 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b6358ab2-881b-440f-a37c-fd1afc24c235" name="Changes" comment="INTEGRATION NUTRITIONIST WITH CALENDER">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_51_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_51__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_52_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_09_11_2025_17_52__Changes_.xml" beforeDir="false" />
+    <list default="true" id="b6358ab2-881b-440f-a37c-fd1afc24c235" name="Changes" comment="INTEGRATION NUTRITIONIST WITH CALENDER v2">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/MainActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/menu/MenuFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/menu/MenuFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/menu/MenuViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/sanna/provcalapp/ui/menu/MenuViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -415,7 +407,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762767564971</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="INTEGRATION NUTRITIONIST WITH CALENDER v2">
+      <option name="closed" value="true" />
+      <created>1765255108286</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1765255108286</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -437,7 +437,8 @@
     <MESSAGE value="Init Integration UH -  NU - 01" />
     <MESSAGE value="INTEGRATION NUTRITION AND LOGIN" />
     <MESSAGE value="INTEGRATION NUTRITIONIST WITH CALENDER" />
-    <option name="LAST_COMMIT_MESSAGE" value="INTEGRATION NUTRITIONIST WITH CALENDER" />
+    <MESSAGE value="INTEGRATION NUTRITIONIST WITH CALENDER v2" />
+    <option name="LAST_COMMIT_MESSAGE" value="INTEGRATION NUTRITIONIST WITH CALENDER v2" />
   </component>
   <component name="com.apollographql.ijplugin.settings.ProjectSettingsState">
     <option name="apolloKotlinServices">

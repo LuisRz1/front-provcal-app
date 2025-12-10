@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Base64
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +27,10 @@ import com.sanna.provcalapp.type.MenuChangeItemInput
 import java.io.InputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MenuFragment : Fragment() {
 
@@ -170,17 +175,46 @@ class MenuFragment : Fragment() {
         row.removeAllViews()
 
         val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH) + 1
+        val monthIndex = calendar.get(Calendar.MONTH) // 0-based
 
-        // Obtener cantidad de días del mes actual
         val tmpCal = Calendar.getInstance().apply {
             set(Calendar.YEAR, year)
-            set(Calendar.MONTH, month - 1)
+            set(Calendar.MONTH, monthIndex)
+            set(Calendar.DAY_OF_MONTH, 1)
         }
+
+        val firstWeekday = tmpCal.get(Calendar.DAY_OF_WEEK) // 1 = Sunday ... 7 = Saturday
+
+        // Mapeo para cabecera: Lun, Mar, Mié, Jue, Vie, Sab, Dom
+        val offset = when (firstWeekday) {
+            Calendar.MONDAY    -> 0
+            Calendar.TUESDAY   -> 1
+            Calendar.WEDNESDAY -> 2
+            Calendar.THURSDAY  -> 3
+            Calendar.FRIDAY    -> 4
+            Calendar.SATURDAY  -> 5
+            Calendar.SUNDAY    -> 6
+            else               -> 0
+        }
+
+        // espacios vacíos antes del 1
+        for (i in 0 until offset) {
+            val spacer = View(requireContext())
+            val lp = LinearLayout.LayoutParams(
+                dpToPx(40),
+                dpToPx(40)
+            )
+            lp.marginEnd = dpToPx(8)
+            spacer.layoutParams = lp
+            row.addView(spacer)
+        }
+
+        tmpCal.set(Calendar.DAY_OF_MONTH, 1)
         val daysInMonth = tmpCal.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val monthNumber = monthIndex + 1
 
         for (dayNum in 1..daysInMonth) {
-            val dateIso = String.format(Locale.US, "%04d-%02d-%02d", year, month, dayNum)
+            val dateIso = String.format(Locale.US, "%04d-%02d-%02d", year, monthNumber, dayNum)
 
             // Buscar si hay menú para esa fecha
             val dayData = menu.days.firstOrNull { it.date.startsWith(dateIso) }
@@ -200,7 +234,7 @@ class MenuFragment : Fragment() {
                 cardElevation = 0f
                 setCardBackgroundColor(
                     when {
-                        isSelected -> Color.parseColor("#18A558") // verde seleccionado
+                        isSelected -> Color.parseColor("#18A558")
                         else -> Color.TRANSPARENT
                     }
                 )
@@ -216,8 +250,8 @@ class MenuFragment : Fragment() {
                     setTextColor(
                         when {
                             isSelected -> Color.WHITE
-                            hasMenu -> Color.parseColor("#202124")
-                            else -> Color.parseColor("#BDBDBD")
+                            hasMenu   -> Color.parseColor("#202124")
+                            else      -> Color.parseColor("#BDBDBD")
                         }
                     )
                 }
@@ -247,6 +281,7 @@ class MenuFragment : Fragment() {
     private fun dpToPx(dp: Int): Int =
         (dp * resources.displayMetrics.density).toInt()
 
+    // ===== CARD DEL MENÚ DEL DÍA =====
     private fun renderMenuDayCard() {
         val day = selectedDay ?: return
         val container = currentView?.findViewById<LinearLayout>(R.id.containerMenuDay) ?: return
@@ -255,30 +290,439 @@ class MenuFragment : Fragment() {
 
         val cardView = layoutInflater.inflate(R.layout.layout_menu_day_card, container, false)
 
-        // Parse meals
-        val breakfast = day.breakfast?.split("|")?.map { it.trim() } ?: emptyList()
-        val lunch = day.lunch?.split("|")?.map { it.trim() } ?: emptyList()
-        val dinner = day.dinner?.split("|")?.map { it.trim() } ?: emptyList()
+        val meals = day.meals ?: emptyList()
+
+        // Labels principales de las dos filas grandes
+        val tvMainLabel1 = cardView.findViewById<TextView>(R.id.tvMainLabel1)
+        val tvMainLabel2 = cardView.findViewById<TextView>(R.id.tvMainLabel2)
+
+        // Views principales
+        val tvBebida = cardView.findViewById<TextView>(R.id.tvBebida)
+        val tvBebidaCal = cardView.findViewById<TextView>(R.id.tvBebidaCalorias)
+        val tvPlato = cardView.findViewById<TextView>(R.id.tvPlato)
+        val tvPlatoCal = cardView.findViewById<TextView>(R.id.tvPlatoCalorias)
+        val tvTotal = cardView.findViewById<TextView>(R.id.tvTotal)
+
+        val rowGuarn1 = cardView.findViewById<LinearLayout>(R.id.rowGuarnicion1)
+        val rowGuarn2 = cardView.findViewById<LinearLayout>(R.id.rowGuarnicion2)
+        val rowPan = cardView.findViewById<LinearLayout>(R.id.rowPan)
+        val rowSandwich1 = cardView.findViewById<LinearLayout>(R.id.rowSandwich1)
+        val rowSandwich2 = cardView.findViewById<LinearLayout>(R.id.rowSandwich2)
+
+        val tvGuarnLabel1 = cardView.findViewById<TextView>(R.id.tvGuarnLabel1)
+        val tvGuarn1 = cardView.findViewById<TextView>(R.id.tvGuarn1)
+        val tvGuarnCal1 = cardView.findViewById<TextView>(R.id.tvGuarnCal1)
+
+        val tvGuarnLabel2 = cardView.findViewById<TextView>(R.id.tvGuarnLabel2)
+        val tvGuarn2 = cardView.findViewById<TextView>(R.id.tvGuarn2)
+        val tvGuarnCal2 = cardView.findViewById<TextView>(R.id.tvGuarnCal2)
+
+        val tvPanLabel = cardView.findViewById<TextView>(R.id.tvPanLabel)
+        val tvPan = cardView.findViewById<TextView>(R.id.tvPan)
+        val tvPanCalorias = cardView.findViewById<TextView>(R.id.tvPanCalorias)
+
+        val tvSandwichLabel1 = cardView.findViewById<TextView>(R.id.tvSandwichLabel1)
+        val tvSandwich1 = cardView.findViewById<TextView>(R.id.tvSandwich1)
+        val tvSandwichCal1 = cardView.findViewById<TextView>(R.id.tvSandwichCal1)
+
+        val tvSandwichLabel2 = cardView.findViewById<TextView>(R.id.tvSandwichLabel2)
+        val tvSandwich2 = cardView.findViewById<TextView>(R.id.tvSandwich2)
+        val tvSandwichCal2 = cardView.findViewById<TextView>(R.id.tvSandwichCal2)
+
+        // Reset de filas opcionales
+        rowGuarn1.visibility = View.GONE
+        rowGuarn2.visibility = View.GONE
+        rowPan.visibility = View.GONE
+        rowSandwich2.visibility = View.GONE
+        rowSandwich1.visibility = View.GONE
+
+        // ===== Helpers =====
+        fun normalizeKey(raw: String?): String {
+            if (raw == null) return ""
+            val upper = raw.trim().uppercase(Locale.ROOT)
+            val noAccents = upper
+                .replace('Á', 'A')
+                .replace('É', 'E')
+                .replace('Í', 'I')
+                .replace('Ó', 'O')
+                .replace('Ú', 'U')
+                .replace('Ü', 'U')
+                .replace('Ñ', 'N')
+            return noAccents.replace("\\s+".toRegex(), " ")
+        }
+
+        fun getComponentsFor(mealTypeName: String): List<MonthlyMenuQuery.Component> {
+            val target = normalizeKey(mealTypeName)
+            val meal = meals.firstOrNull {
+                val mt = normalizeKey(it.mealType?.toString())
+                mt == target
+            }
+
+            val list = meal?.components
+                ?.filterNotNull()
+                ?.sortedBy { it.order ?: Int.MAX_VALUE }
+                ?: emptyList()
+
+            Log.d(
+                "MenuDebug",
+                "getComponentsFor($mealTypeName) -> ${list.map { "${it.order}:${it.componentType}:${it.dishName}" }}"
+            )
+
+            return list
+        }
+
+        fun findComp(
+            components: List<MonthlyMenuQuery.Component>,
+            vararg types: String
+        ): MonthlyMenuQuery.Component? {
+            val candidates = types.map { normalizeKey(it) }.filter { it.isNotEmpty() }
+            if (candidates.isEmpty()) return null
+
+            return components.firstOrNull { comp ->
+                val t = normalizeKey(comp.componentType)
+                if (t.isEmpty()) return@firstOrNull false
+
+                candidates.any { cand ->
+                    t == cand || t.contains(cand)
+                }
+            }
+        }
+
+        // Fallback: primero busca por tipo, y si no encuentra, usa la posición (order / índice)
+        fun compByTypeOrIndex(
+            components: List<MonthlyMenuQuery.Component>,
+            index: Int,
+            vararg types: String
+        ): MonthlyMenuQuery.Component? {
+            val byType = findComp(components, *types)
+            if (byType != null) return byType
+
+            val sorted = components.sortedBy { it.order ?: Int.MAX_VALUE }
+            return sorted.getOrNull(index)
+        }
+
+        fun setMainRow(textView: TextView, calView: TextView, comp: MonthlyMenuQuery.Component?) {
+            if (comp == null || comp.dishName.isNullOrBlank()) {
+                textView.text = "—"
+                calView.text = "—"
+            } else {
+                textView.text = comp.dishName
+                calView.text = comp.calories?.let { "$it Kcal" } ?: "—"
+            }
+        }
+
+        var totalCalories = 0
 
         when (currentMeal) {
+            // ===== DESAYUNO =====
             "breakfast" -> {
-                cardView.findViewById<TextView>(R.id.tvBebida)?.text =
-                    breakfast.getOrNull(0) ?: "—"
-                cardView.findViewById<TextView>(R.id.tvBebidaCalorias)?.text =
-                    breakfast.getOrNull(1) ?: "—"
+                tvMainLabel1.text = "Bebida Caliente"
+                tvMainLabel2.text = "Plato Caliente"
+
+                val components = getComponentsFor("BREAKFAST")
+                totalCalories = components.sumOf { it.calories ?: 0 }
+
+                val bebida = compByTypeOrIndex(
+                    components,
+                    0,
+                    "BEBIDA CALIENTE",
+                    "BEBIDA"
+                )
+                val platoCaliente = compByTypeOrIndex(
+                    components,
+                    1,
+                    "PLATO CALIENTE",
+                    "PLATO DE FONDO"
+                )
+
+                val guarn1 = compByTypeOrIndex(
+                    components,
+                    2,
+                    "GUARNICION 1",
+                    "GUARNICIÓN 1",
+                    "GUARNICION"
+                )
+                val guarn2 = compByTypeOrIndex(
+                    components,
+                    3,
+                    "GUARNICION 2",
+                    "GUARNICIÓN 2"
+                )
+
+                val panComp = compByTypeOrIndex(
+                    components,
+                    4,
+                    "PAN"
+                )
+
+                val sand1 = compByTypeOrIndex(
+                    components,
+                    5,
+                    "SANDWICH 1",
+                    "SÁNDWICH 1",
+                    "SANDWICH"
+                )
+                val sand2 = compByTypeOrIndex(
+                    components,
+                    6,
+                    "SANDWICH 2",
+                    "SÁNDWICH 2"
+                )
+
+                // Bebida y plato caliente
+                setMainRow(tvBebida, tvBebidaCal, bebida)
+                setMainRow(tvPlato, tvPlatoCal, platoCaliente)
+
+                // Guarniciones
+                val hasG1 = guarn1?.dishName?.isNotBlank() == true
+                val hasG2 = guarn2?.dishName?.isNotBlank() == true
+
+                if (!hasG1 && !hasG2) {
+                    rowGuarn1.visibility = View.GONE
+                    rowGuarn2.visibility = View.GONE
+                } else if (hasG1 && !hasG2) {
+                    rowGuarn1.visibility = View.VISIBLE
+                    tvGuarnLabel1.text = "Guarnición"
+                    setMainRow(tvGuarn1, tvGuarnCal1, guarn1)
+                    rowGuarn2.visibility = View.GONE
+                } else if (!hasG1 && hasG2) {
+                    rowGuarn1.visibility = View.VISIBLE
+                    tvGuarnLabel1.text = "Guarnición"
+                    setMainRow(tvGuarn1, tvGuarnCal1, guarn2)
+                    rowGuarn2.visibility = View.GONE
+                } else {
+                    rowGuarn1.visibility = View.VISIBLE
+                    rowGuarn2.visibility = View.VISIBLE
+                    tvGuarnLabel1.text = "Guarnición 1"
+                    tvGuarnLabel2.text = "Guarnición 2"
+                    setMainRow(tvGuarn1, tvGuarnCal1, guarn1)
+                    setMainRow(tvGuarn2, tvGuarnCal2, guarn2)
+                }
+
+                // Pan
+                if (panComp == null || panComp.dishName.isNullOrBlank()) {
+                    rowPan.visibility = View.GONE
+                } else {
+                    rowPan.visibility = View.VISIBLE
+                    tvPanLabel.text = "Pan"
+                    setMainRow(tvPan, tvPanCalorias, panComp)
+                }
+
+                // Sandwiches
+                val hasS1 = sand1?.dishName?.isNotBlank() == true
+                val hasS2 = sand2?.dishName?.isNotBlank() == true
+
+                if (!hasS1 && !hasS2) {
+                    rowSandwich1.visibility = View.GONE
+                    rowSandwich2.visibility = View.GONE
+                } else if (hasS1 && !hasS2) {
+                    rowSandwich1.visibility = View.VISIBLE
+                    tvSandwichLabel1.text = "Sandwich"
+                    setMainRow(tvSandwich1, tvSandwichCal1, sand1)
+                    rowSandwich2.visibility = View.GONE
+                } else if (!hasS1 && hasS2) {
+                    rowSandwich1.visibility = View.VISIBLE
+                    tvSandwichLabel1.text = "Sandwich"
+                    setMainRow(tvSandwich1, tvSandwichCal1, sand2)
+                    rowSandwich2.visibility = View.GONE
+                } else {
+                    rowSandwich1.visibility = View.VISIBLE
+                    rowSandwich2.visibility = View.VISIBLE
+                    tvSandwichLabel1.text = "Sandwich 1"
+                    tvSandwichLabel2.text = "Sandwich 2"
+                    setMainRow(tvSandwich1, tvSandwichCal1, sand1)
+                    setMainRow(tvSandwich2, tvSandwichCal2, sand2)
+                }
             }
+
+            // ===== ALMUERZO =====
             "lunch" -> {
-                cardView.findViewById<TextView>(R.id.tvPlato)?.text =
-                    lunch.getOrNull(0) ?: "—"
-                cardView.findViewById<TextView>(R.id.tvPlatoCalorias)?.text =
-                    lunch.getOrNull(1) ?: "—"
+                tvMainLabel1.text = "Entrada"
+                tvMainLabel2.text = "Plato de fondo 1"
+
+                val components = getComponentsFor("LUNCH")
+                totalCalories = components.sumOf { it.calories ?: 0 }
+
+                val entrada     = compByTypeOrIndex(components, 0, "ENTRADA")
+                val sopa        = compByTypeOrIndex(components, 1, "SOPA")
+                val platoFondo1 = compByTypeOrIndex(
+                    components,
+                    2,
+                    "PLATO DE FONDO 1",
+                    "PLATO DE FONDO"
+                )
+                val platoFondo2 = compByTypeOrIndex(
+                    components,
+                    3,
+                    "PLATO DE FONDO 2"
+                )
+                val guarn1      = compByTypeOrIndex(
+                    components,
+                    4,
+                    "GUARNICION 1",
+                    "GUARNICIÓN 1"
+                )
+                val guarn2      = compByTypeOrIndex(
+                    components,
+                    5,
+                    "GUARNICION 2",
+                    "GUARNICIÓN 2"
+                )
+                val acompan     = compByTypeOrIndex(
+                    components,
+                    6,
+                    "ACOMPANAMIENTO",
+                    "ACOMPAÑAMIENTO"
+                )
+                val postre      = compByTypeOrIndex(components, 7, "POSTRE")
+                val refresco    = compByTypeOrIndex(components, 8, "REFRESCO")
+
+                // Entrada y PF1 en las filas principales
+                setMainRow(tvBebida, tvBebidaCal, entrada)
+                setMainRow(tvPlato, tvPlatoCal, platoFondo1)
+
+                // Sopa en Guarnición 1
+                if (sopa != null && !sopa.dishName.isNullOrBlank()) {
+                    rowGuarn1.visibility = View.VISIBLE
+                    tvGuarnLabel1.text = "Sopa"
+                    setMainRow(tvGuarn1, tvGuarnCal1, sopa)
+                } else {
+                    rowGuarn1.visibility = View.GONE
+                }
+
+                // Guarniciones combinadas en Guarnición 2
+                if ((guarn1 != null && !guarn1.dishName.isNullOrBlank()) ||
+                    (guarn2 != null && !guarn2.dishName.isNullOrBlank())
+                ) {
+                    rowGuarn2.visibility = View.VISIBLE
+                    tvGuarnLabel2.text = "Guarnición"
+
+                    val textoGuarn = when {
+                        guarn1 != null && !guarn1.dishName.isNullOrBlank() &&
+                                guarn2 != null && !guarn2.dishName.isNullOrBlank() ->
+                            "${guarn1.dishName} / ${guarn2.dishName}"
+                        guarn1 != null && !guarn1.dishName.isNullOrBlank() ->
+                            guarn1.dishName
+                        else ->
+                            guarn2?.dishName ?: "—"
+                    }
+
+                    tvGuarn2.text = textoGuarn
+                    tvGuarnCal2.text = "—"
+                } else {
+                    rowGuarn2.visibility = View.GONE
+                }
+
+                // Acompañamiento en la fila de Pan
+                if (acompan != null && !acompan.dishName.isNullOrBlank()) {
+                    rowPan.visibility = View.VISIBLE
+                    tvPanLabel.text = "Acompañamiento"
+                    setMainRow(tvPan, tvPanCalorias, acompan)
+                } else {
+                    rowPan.visibility = View.GONE
+                }
+
+                // Postre en Sandwich 1
+                if (postre != null && !postre.dishName.isNullOrBlank()) {
+                    rowSandwich1.visibility = View.VISIBLE
+                    tvSandwichLabel1.text = "Postre"
+                    setMainRow(tvSandwich1, tvSandwichCal1, postre)
+                } else {
+                    rowSandwich1.visibility = View.GONE
+                }
+
+                // Refresco en Sandwich 2
+                if (refresco != null && !refresco.dishName.isNullOrBlank()) {
+                    rowSandwich2.visibility = View.VISIBLE
+                    tvSandwichLabel2.text = "Refresco"
+                    setMainRow(tvSandwich2, tvSandwichCal2, refresco)
+                } else {
+                    rowSandwich2.visibility = View.GONE
+                }
             }
+
+            // ===== CENA =====
             "dinner" -> {
-                cardView.findViewById<TextView>(R.id.tvSandwich)?.text =
-                    dinner.getOrNull(0) ?: "—"
-                cardView.findViewById<TextView>(R.id.tvSandwichCalorias)?.text =
-                    dinner.getOrNull(1) ?: "—"
+                tvMainLabel1.text = "Plato de fondo 1"
+                tvMainLabel2.text = "Plato de fondo 2"
+
+                val components = getComponentsFor("DINNER")
+                totalCalories = components.sumOf { it.calories ?: 0 }
+
+                val platoFondo1 = compByTypeOrIndex(
+                    components,
+                    0,
+                    "PLATO DE FONDO 1",
+                    "PLATO DE FONDO"
+                )
+                val platoFondo2 = compByTypeOrIndex(
+                    components,
+                    1,
+                    "PLATO DE FONDO 2"
+                )
+                val guarn1      = compByTypeOrIndex(
+                    components,
+                    2,
+                    "GUARNICION 1",
+                    "GUARNICIÓN 1"
+                )
+                val guarn2      = compByTypeOrIndex(
+                    components,
+                    3,
+                    "GUARNICION 2",
+                    "GUARNICIÓN 2"
+                )
+                val acompan     = compByTypeOrIndex(
+                    components,
+                    4,
+                    "ACOMPANAMIENTO",
+                    "ACOMPAÑAMIENTO"
+                )
+                val infusion    = compByTypeOrIndex(
+                    components,
+                    5,
+                    "INFUSION",
+                    "INFUSIÓN"
+                )
+
+                setMainRow(tvBebida, tvBebidaCal, platoFondo1)
+                setMainRow(tvPlato, tvPlatoCal, platoFondo2)
+
+                // Guarniciones
+                if (guarn1 != null && !guarn1.dishName.isNullOrBlank()) {
+                    rowGuarn1.visibility = View.VISIBLE
+                    tvGuarnLabel1.text = "Guarnición 1"
+                    setMainRow(tvGuarn1, tvGuarnCal1, guarn1)
+                } else rowGuarn1.visibility = View.GONE
+
+                if (guarn2 != null && !guarn2.dishName.isNullOrBlank()) {
+                    rowGuarn2.visibility = View.VISIBLE
+                    tvGuarnLabel2.text = "Guarnición 2"
+                    setMainRow(tvGuarn2, tvGuarnCal2, guarn2)
+                } else rowGuarn2.visibility = View.GONE
+
+                // Acompañamiento
+                if (acompan != null && !acompan.dishName.isNullOrBlank()) {
+                    rowPan.visibility = View.VISIBLE
+                    tvPanLabel.text = "Acompañamiento"
+                    setMainRow(tvPan, tvPanCalorias, acompan)
+                } else rowPan.visibility = View.GONE
+
+                // Infusión
+                if (infusion != null && !infusion.dishName.isNullOrBlank()) {
+                    rowSandwich1.visibility = View.VISIBLE
+                    tvSandwichLabel1.text = "Infusión"
+                    setMainRow(tvSandwich1, tvSandwichCal1, infusion)
+                } else rowSandwich1.visibility = View.GONE
+
+                rowSandwich2.visibility = View.GONE
             }
+        }
+
+        tvTotal.text = if (totalCalories > 0) {
+            "Total: $totalCalories Kcal"
+        } else {
+            "Total: —"
         }
 
         // Botones de tipo de comida
@@ -304,7 +748,6 @@ class MenuFragment : Fragment() {
             renderMenuDayCard()
         }
 
-        // Edit button
         cardView.findViewById<com.google.android.material.floatingactionbutton.FloatingActionButton>(R.id.fabEdit)
             ?.setOnClickListener {
                 showEditDialog(day)
@@ -338,28 +781,63 @@ class MenuFragment : Fragment() {
     }
 
     private fun handleSelectedFile(uri: Uri) {
-        val yearText =
-            currentView?.findViewById<AutoCompleteTextView>(R.id.acYear)?.text?.toString()
-        val monthText =
-            currentView?.findViewById<AutoCompleteTextView>(R.id.acMonth)?.text?.toString()
+        val yearText = currentView
+            ?.findViewById<AutoCompleteTextView>(R.id.acYear)
+            ?.text
+            ?.toString()
 
-        val y = yearText?.toIntOrNull() ?: return
+        val monthText = currentView
+            ?.findViewById<AutoCompleteTextView>(R.id.acMonth)
+            ?.text
+            ?.toString()
+
+        val y = yearText?.toIntOrNull() ?: calendar.get(Calendar.YEAR)
+
         val months = arrayOf(
             "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
             "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
         )
-        val m = months.indexOf(monthText) + 1
-        if (m <= 0) return
+        val monthIndexFromUi = months.indexOf(monthText)
+        val m = if (monthIndexFromUi >= 0) monthIndexFromUi + 1 else calendar.get(Calendar.MONTH) + 1
 
         val fileName = getFileName(uri) ?: "menu_${y}_${m}.xlsx"
+
         val base64 = readAsBase64(uri) ?: run {
-            Toast.makeText(requireContext(), "No se pudo leer el archivo", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(
+                requireContext(),
+                "No se pudo leer el archivo",
+                Toast.LENGTH_SHORT
+            ).show()
             return
         }
 
-        // Popup de confirmación de importación
-        showImportDialog(y, m, fileName, base64)
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Importar menú")
+            .setMessage("Se importará el archivo:\n\n$fileName\n\npara $m/$y.")
+            .setPositiveButton("Importar") { _, _ ->
+                vm.uploadMenu(y, m, fileName, base64, overwrite = false) { conflict ->
+                    if (conflict) {
+                        MaterialAlertDialogBuilder(requireContext())
+                            .setTitle("Sobrescribir menú")
+                            .setMessage("Ya existe un menú para este mes. ¿Deseas reemplazarlo?")
+                            .setPositiveButton("Sí, reemplazar") { _, _ ->
+                                vm.uploadMenu(y, m, fileName, base64, overwrite = true) {
+                                    calendar.set(Calendar.YEAR, y)
+                                    calendar.set(Calendar.MONTH, m - 1)
+                                    showListView()
+                                }
+                            }
+                            .setNegativeButton("Cancelar", null)
+                            .show()
+                    } else {
+                        calendar.set(Calendar.YEAR, y)
+                        calendar.set(Calendar.MONTH, m - 1)
+                        showListView()
+                    }
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
     private fun getFileName(uri: Uri): String? {

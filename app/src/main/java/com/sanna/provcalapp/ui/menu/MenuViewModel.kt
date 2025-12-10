@@ -18,11 +18,11 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
     private val _menu = MutableLiveData<MonthlyMenuQuery.Menu?>()
     val menu: LiveData<MonthlyMenuQuery.Menu?> = _menu
 
-    private val _loading = MutableLiveData(false)
-    val loading: LiveData<Boolean> = _loading
-
     private val _message = MutableLiveData<String?>()
     val message: LiveData<String?> = _message
+
+    private val _loading = MutableLiveData(false)
+    val loading: LiveData<Boolean> = _loading
 
     fun loadMenu(year: Int, month: Int) {
         _loading.value = true
@@ -55,15 +55,13 @@ class MenuViewModel(application: Application) : AndroidViewModel(application) {
                 is Result.Success -> {
                     _message.value = r.data
                     loadMenu(year, month)
+                    // Con el backend nuevo ya no hay "conflict",
+                    // así que siempre devolvemos false.
                     onResult(false)
                 }
                 is Result.Error -> {
-                    if (r.message.startsWith("conflict:")) {
-                        onResult(true)
-                    } else {
-                        _message.value = r.message
-                        onResult(false)
-                    }
+                    _message.value = r.message
+                    onResult(false)
                 }
                 is Result.Loading -> { }
             }

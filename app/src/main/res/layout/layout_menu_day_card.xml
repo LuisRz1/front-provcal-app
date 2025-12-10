@@ -69,7 +69,7 @@
                 app:cornerRadius="20dp"/>
         </LinearLayout>
 
-        <!-- Bebida Caliente -->
+        <!-- Fila 1 (Bebida / Entrada / PF1) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,6 +91,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvMainLabel1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Bebida Caliente"
@@ -118,7 +119,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Plato Caliente -->
+        <!-- Fila 2 (Plato / PF1 o PF2) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -140,6 +141,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvMainLabel2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Plato Caliente"
@@ -167,8 +169,165 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Sandwich -->
+        <!-- GUARNICIÓN 1 -->
         <LinearLayout
+            android:id="@+id/rowGuarnicion1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start"
+            android:layout_marginBottom="20dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/food_bank_24"
+                app:tint="#000000"
+                android:layout_marginEnd="16dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvGuarnLabel1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Guarnición"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#202124"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvGuarn1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="14sp"
+                    android:textColor="#5F6368"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvGuarnCal1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#5F6368"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- GUARNICIÓN 2 -->
+        <LinearLayout
+            android:id="@+id/rowGuarnicion2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start"
+            android:layout_marginBottom="20dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/food_bank_24"
+                app:tint="#000000"
+                android:layout_marginEnd="16dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvGuarnLabel2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Guarnición 2"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#202124"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvGuarn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="14sp"
+                    android:textColor="#5F6368"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvGuarnCal2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#5F6368"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- PAN / ACOMP -->
+        <LinearLayout
+            android:id="@+id/rowPan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start"
+            android:layout_marginBottom="20dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/food_bank_24"
+                app:tint="#000000"
+                android:layout_marginEnd="16dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPanLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pan"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#202124"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvPan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="14sp"
+                    android:textColor="#5F6368"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvPanCalorias"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="13sp"
+                    android:textColor="#5F6368"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Sandwich 1 / Postre / Infusión -->
+        <LinearLayout
+            android:id="@+id/rowSandwich1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -189,6 +348,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/tvSandwichLabel1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Sandwich"
@@ -198,7 +358,7 @@
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
-                    android:id="@+id/tvSandwich"
+                    android:id="@+id/tvSandwich1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="2 panes con jamonada"
@@ -207,10 +367,62 @@
                     android:layout_marginBottom="4dp"/>
 
                 <TextView
-                    android:id="@+id/tvSandwichCalorias"
+                    android:id="@+id/tvSandwichCal1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="256 Kcal"
+                    android:textSize="13sp"
+                    android:textColor="#5F6368"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Sandwich 2 / Refresco -->
+        <LinearLayout
+            android:id="@+id/rowSandwich2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="start"
+            android:layout_marginBottom="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/food_bank_24"
+                app:tint="#000000"
+                android:layout_marginEnd="16dp"/>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvSandwichLabel2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sandwich 2"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#202124"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvSandwich2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
+                    android:textSize="14sp"
+                    android:textColor="#5F6368"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:id="@+id/tvSandwichCal2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="—"
                     android:textSize="13sp"
                     android:textColor="#5F6368"/>
             </LinearLayout>

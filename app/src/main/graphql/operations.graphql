@@ -118,19 +118,30 @@ mutation EndBreak($latitude: Float!, $longitude: Float!, $accuracy: Float!) {
 
 
 query MonthlyMenu($year: Int!, $month: Int!) {
-  menu(year: $year, month: $month) {
-    year
-    month
-    days {
-      id
-      date
-      breakfast
-      lunch
-      dinner
-      isHoliday
+    menu(year: $year, month: $month) {
+        year
+        month
+        days {
+            id
+            date
+            breakfast
+            lunch
+            dinner
+            isHoliday
+            meals {
+                mealType
+                totalKcal
+                components {
+                    componentType
+                    dishName
+                    calories
+                    order
+                }
+            }
+        }
     }
-  }
 }
+
 
 mutation UploadMonthlyMenu($input: UploadMonthlyMenuInput!) {
   uploadMonthlyMenu(input: $input) {

@@ -26,6 +26,14 @@ class MenuRepository(context: Context) {
         }
     }
 
+    /**
+     * Sube el menú mensual leyendo el Excel que viene en base64.
+     *
+     * El backend nuevo:
+     *  - Siempre hace upsert del menú del mes.
+     *  - Devuelve status "ok" en caso de éxito.
+     *  - Ya no devuelve "conflict", así que no intentamos confirmar overwrite aquí.
+     */
     suspend fun uploadMonthlyMenu(
         year: Int,
         month: Int,
@@ -34,34 +42,26 @@ class MenuRepository(context: Context) {
         overwriteIfConflict: Boolean
     ): Result<String> {
         return try {
-            // Si tu input está en com.sanna.provcalapp.type, usa: type.UploadMonthlyMenuInput(...)
             val input = UploadMonthlyMenuInput(
                 year = year,
                 month = month,
                 filename = filename,
                 fileBase64 = fileBase64
             )
+
             val resp = apolloClient.mutation(UploadMonthlyMenuMutation(input)).execute()
-            if (resp.hasErrors()) return Result.Error(resp.errors?.firstOrNull()?.message ?: "Error subiendo menú")
 
-            val status = resp.data?.uploadMonthlyMenu?.status ?: "error"
-            val message = resp.data?.uploadMonthlyMenu?.message ?: ""
+            if (resp.hasErrors()) {
+                Result.Error(resp.errors?.firstOrNull()?.message ?: "Error subiendo menú")
+            } else {
+                val status = resp.data?.uploadMonthlyMenu?.status ?: "error"
+                val message = resp.data?.uploadMonthlyMenu?.message ?: ""
 
-            when (status) {
-                "ok" -> Result.Success(message.ifEmpty { "Menú cargado" })
-                "conflict" -> {
-                    if (!overwriteIfConflict) {
-                        Result.Error("conflict:$message")
-                    } else {
-                        val conf = apolloClient.mutation(ConfirmOverwriteMonthlyMenuMutation(input)).execute()
-                        if (conf.hasErrors()) {
-                            Result.Error(conf.errors?.firstOrNull()?.message ?: "Error confirmando overwrite")
-                        } else {
-                            Result.Success(conf.data?.confirmOverwriteMenu?.message ?: "Menú reemplazado")
-                        }
-                    }
+                if (status == "ok") {
+                    Result.Success(message.ifEmpty { "Menú cargado correctamente" })
+                } else {
+                    Result.Error(message.ifEmpty { "No se pudo subir el menú" })
                 }
-                else -> Result.Error(message.ifEmpty { "No se pudo subir el menú" })
             }
         } catch (e: ApolloException) {
             Result.Error("Error de conexión: ${e.message}", e)
